@@ -1,71 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Home</title>
+{% extends "defualt_layout.html" %}
 
-	<!-- Bootstrap CSS -->
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+{% block topbar %}
 
-</head>
+	<div class="col-md-8" style="text-align: right"><h4><a href="{{ url_for('main.logout') }}" style="color: black">Logout</a></h4></div>
 
-<style type="text/css">
-	.content-section {
-	  background: #ffffff;
-	  padding: 10px 20px;
-	  border: 1px solid #dddddd;
-	  border-radius: 3px;
-	  margin-bottom: 20px;
-	}
+{% endblock topbar %}
 
+{% block content %}
 
-</style>
-
-<body>
-
-	<!-- <h1>Home Page File Loaded</h1> -->
-
-	<!-- The top bar -->
-	<div class="row top-bar" style="background-color: blue">
-		<div class="col-md-8"><h1>Charging Booth Controller</h1></div>
-	</div>
-
-	<!-- Login form -->
-	<div class="content-section" style="max-width: 100vh; margin-left: 20px; margin-top: 20px">
-		<form method="POST" action="">
-			{{ form.hidden_tag() }}
-			<fieldset class="form-group">
-				<legend class="border-bottom mb-4">System Admin: Log In</legend>
-				
-				{% for field in form %}
-                    {% if field.type != "SubmitField" and field.id != "csrf_token" %}
-                        <div class="form-group">
-                            {{ field.label(class="form-control-label") }}
-
-                            {% if field.errors %}
-                                {{ field(class="form-control form-control-lg is-invalid") }}
-                                <div class="invalid-feedback">
-                                    {% for error in field.errors %}
-                                        <span>{{ error }}</span>
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ field(class="form-control form-control-lg") }}
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                {% endfor %}
-                
-			</fieldset>
-			<div class="form-group">
-				{{ form.submit(class="btn btn-outline-info") }}
-				<small class="text-muted ml-2">
-				<a href="#">Forgot Password?</a>
-				</small>
-			</div>
-
-		</form>
-
-	</div>
-
-</body>
-</html>
+{% endblock content %}
