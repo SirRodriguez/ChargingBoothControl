@@ -18,12 +18,18 @@
 	}
 
 
+	.list_container{
+		border-radius: 15px;
+		background-color: royalblue;
+	}
+
 </style>
 
-<body>
+<!-- BODY -->
+<body style="background-color: white">
 
 	<!-- The top bar -->
-	<div class="row" style="background-color: blue; padding-left: 10vh; padding-right: 10vh">
+	<div class="row" style="background-color: royalblue; padding-left: 10vh; padding-right: 10vh">
 		{% if title %}
 			<div class="col-md-4"><h4><a href="{{ url_for('main.home') }}" style="color: black">Charging Booth Controller</a> - {{ title }}</h4></div>
 		{% else %}
@@ -45,7 +51,7 @@
 		{% endif %}
 	{% endwith %}
 
-	
+	<!-- This is where all the content goes. -->
 	{% block content %}{% endblock content %}
 
 </body>
