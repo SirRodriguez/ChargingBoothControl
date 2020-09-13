@@ -22,6 +22,7 @@ def admin_login():
 	return render_template("login.html", title="Login", form=form)
 
 # Register
+# This will be removed in actuall production. This is just to get admin user in the database
 @main.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -36,6 +37,11 @@ def register():
         return redirect(url_for('main.home'))
     return render_template('register.html', title='Register', form=form)
 
+# Log out
+@main.route("/logout")
+def logout():
+	logout_user()
+	return redirect(url_for('main.admin_login'))
 
 # Home
 @main.route("/", methods=['GET', 'POST'])
@@ -46,8 +52,22 @@ def home():
 	return render_template("home.html", title="Home")
 
 
-# Log out
-@main.route("/logout")
-def logout():
-	logout_user()
-	return redirect(url_for('main.admin_login'))
+# Slide Show Pictures
+@main.route("/slide_show_pics")
+@login_required
+def slide_show_pics():
+
+	return render_template("slide_show_pics.html", title="Slide Show Pictures")
+
+# Slide Show Pictures: Upload
+@main.route("/slide_show_pics/upload")
+@login_required
+def upload():
+	return render_template("upload.html", title="Picture Upload")
+
+
+# Slide Show Pictures: Remove
+@main.route("/slide_show_pics/remove")
+@login_required
+def remove():
+	return render_template("remove.html", title="Picture Removal")
