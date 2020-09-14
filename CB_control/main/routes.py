@@ -2,9 +2,14 @@ from flask import render_template, Blueprint, url_for, redirect, flash, request
 from flask_login import login_user, current_user, logout_user, login_required
 from CB_control import bcrypt, db
 from CB_control.models import AdminUser
-from CB_control.main.forms import LoginForm, RegistrationForm
+from CB_control.main.forms import LoginForm, RegistrationForm, UpdateAccountForm
 
 main = Blueprint('main', __name__)
+
+# Home
+@main.route("/")
+def defualt():
+	return redirect(url_for('main.admin_login'))
 
 # Admin Login
 @main.route("/admin_login", methods=['GET', 'POST'])
@@ -43,8 +48,8 @@ def logout():
 	logout_user()
 	return redirect(url_for('main.admin_login'))
 
+
 # Home
-@main.route("/", methods=['GET', 'POST'])
 @main.route("/home", methods=['GET', 'POST'])
 @login_required
 def home():
@@ -71,3 +76,21 @@ def upload():
 @login_required
 def remove():
 	return render_template("remove.html", title="Picture Removal")
+
+
+# Account Information
+@main.route("/account", methods=['GET', 'POST'])
+@login_required
+def account():
+	form = UpdateAccountForm()
+	if form.validate_on_submit():
+		current_user.username = form.username.data
+		current_user.email = form.email.data
+		db.session.commit()
+		flash('Your account has been updated!', 'success')
+		return redirect(url_for('main.account'))
+	elif request.method == 'GET':
+		form.username.data = current_user.username
+		form.email.data = current_user.email
+
+	return render_template("account.html", title="Account Information", form=form)

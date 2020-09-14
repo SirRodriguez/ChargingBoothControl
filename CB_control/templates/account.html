@@ -1,0 +1,52 @@
+{% extends "defualt_layout.html" %}
+
+{% block topbar %}
+
+	<div class="col-md-8" style="text-align: right"><h4><a href="{{ url_for('main.logout') }}" style="color: black">Logout</a></h4></div>
+
+{% endblock topbar %}
+
+{% block content %}
+
+	<div class="container">
+		<div class="content-section">
+		  <div class="media">
+		    <div class="media-body">
+		      <h2 class="account-heading">Username: {{ current_user.username }}</h2>
+		      <p class="text-secondary">Email: {{ current_user.email }}</p>
+		    </div>
+		  </div>
+	        <form method="POST" action="" enctype="multipart/form-data">
+	            {{ form.hidden_tag() }}
+	            <fieldset class="form-group">
+	                <legend class="border-bottom mb-4">Change Account Info</legend>
+
+	                {% for field in form %}
+	                    {% if field.type != "SubmitField" and field.id != "csrf_token" %}
+	                        <div class="form-group">
+	                            {{ field.label(class="form-control-label") }}
+
+	                            {% if field.errors %}
+	                                {{ field(class="form-control form-control-lg is-invalid") }}
+	                                <div class="invalid-feedback">
+	                                    {% for error in field.errors %}
+	                                        <span>{{ error }}</span>
+	                                    {% endfor %}
+	                                </div>
+	                            {% else %}
+	                                {{ field(class="form-control form-control-lg") }}
+	                            {% endif %}
+	                        </div>
+	                    {% endif %}
+	                {% endfor %}
+	                
+	            </fieldset>
+	            <div class="form-group">
+	                {{ form.submit(class="btn btn-outline-info") }}
+	                <a href="#">Change Password</a>
+	            </div>
+	        </form>
+		</div>
+	</div>
+
+{% endblock content %}
