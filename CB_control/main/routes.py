@@ -79,7 +79,7 @@ def home():
 
 	return render_template("home.html", title="Home", devices=devices)
 
-
+# Show device settings options
 @main.route("/device/<int:id>")
 @login_required
 def device(id):
@@ -113,6 +113,15 @@ def upload():
 @login_required
 def remove():
 	return render_template("remove.html", title="Picture Removal")
+
+# Remove a device from the service
+@main.route("/remove_device/<int:id>")
+@login_required
+def remove_device(id):
+	# remove the device
+	request = requests.delete(service_ip + '/device_module/remove_device/' + str(id))
+	flash('Device has been successfuly removed!', 'success')
+	return redirect(url_for('main.home'))
 
 
 # Account Information
