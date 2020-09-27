@@ -17,29 +17,12 @@
 		</div>
 
 		<div class="col-md-6 list_container">
+			<h2>Your Devices</h2>
 			<dl class="dl-horizontal" style="padding-left: 10px">
-				<!-- 1 -->
-				<hr>
-				<dt><a href="{{ url_for('main.slide_show_pics') }}" style="color: black">Slide Show Pictures</a></dt>
-				<dd>Upload, Remove Slide Show pictures from all, region, or single device at a time.</dd>
-
-
-				<!-- 2 -->
-				<hr>
-				<dt><a href="#Settings" style="color: black">Settings</a></dt>
-				<dd>Change the setting of the devices from all, region, or single device at a time.</dd>
-
-
-				<!-- 3 -->
-				<hr>
-				<dt><a href="#Data" style="color: black">Data</a></dt>
-				<dd>View data recorded from devices.</dd>
-
-
-				<!-- 4 -->
-				<hr>
-				<dt><a href="{{ url_for('main.account') }}" style="color: black">Account</a></dt>
-				<dd>Change account name, email, password.</dd>
+				{% for location, id in devices %}
+					<hr>
+					<dt><a href="{{ url_for('main.device', id=id) }}" style="color: black">{{ location }}</a></dt>
+				{% endfor %}
 
 				<hr>
 			</dl>

@@ -1,8 +1,10 @@
-from flask import render_template, Blueprint, url_for, redirect, flash, request
+from flask import render_template, Blueprint, url_for, redirect, flash, request, json
 from flask_login import login_user, current_user, logout_user, login_required
-from CB_control import bcrypt, db
+from CB_control import bcrypt, db, service_ip
 from CB_control.models import AdminUser
 from CB_control.main.forms import LoginForm, RegistrationForm, UpdateAccountForm
+
+import requests
 
 main = Blueprint('main', __name__)
 
@@ -53,16 +55,51 @@ def logout():
 @main.route("/home", methods=['GET', 'POST'])
 @login_required
 def home():
+	request = requests.get(service_ip + '/device_module/get_all')
 
-	return render_template("home.html", title="Home")
+	device_id_list = request.json()["device_id"]
+	location_list = request.json()["location"]
+
+	devices = zip(location_list, device_id_list)
+
+	# r = requests.post('http://localhost:7000/')
+	# print(r.text)
+
+	# r = requests.put('http://localhost:7000/')
+	# print(r.text)
+
+	# r = requests.patch('http://localhost:7000/')
+	# print(r.text)
+
+	# r = requests.delete('http://localhost:7000/')
+	# print(r.text)
+
+
+
+
+	return render_template("home.html", title="Home", devices=devices)
+
+
+@main.route("/device/<int:id>")
+@login_required
+def device(id):
+	# Grab device location
+	request = requests.get(service_ip + '/device_module/location/' + str(id))
+	location = request.json()["location"]
+
+
+	return render_template("device.html", title="Device", id=id, location=location)
 
 
 # Slide Show Pictures
-@main.route("/slide_show_pics")
+@main.route("/slide_show_pics/<int:id>")
 @login_required
-def slide_show_pics():
+def slide_show_pics(id):
+	# Grab device location
+	request = requests.get(service_ip + '/device_module/location/' + str(id))
+	location = request.json()["location"]
 
-	return render_template("slide_show_pics.html", title="Slide Show Pictures")
+	return render_template("slide_show_pics.html", title="Slide Show Pictures", location=location)
 
 # Slide Show Pictures: Upload
 @main.route("/slide_show_pics/upload")

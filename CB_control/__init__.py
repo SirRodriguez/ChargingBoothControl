@@ -11,6 +11,7 @@ login_manager = LoginManager()
 login_manager.login_view = 'main.admin_login'
 login_manager.login_message_category = 'info'
 mail = Mail()
+service_ip = "http://localhost:7000"
 
 
 def create_app(config_class=Config):
