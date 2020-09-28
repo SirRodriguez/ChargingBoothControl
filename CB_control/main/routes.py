@@ -1,8 +1,9 @@
-from flask import render_template, Blueprint, url_for, redirect, flash, request, json
+from flask import render_template, Blueprint, url_for, redirect, flash, request, json, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from CB_control import bcrypt, db, service_ip
 from CB_control.models import AdminUser
-from CB_control.main.forms import LoginForm, RegistrationForm, UpdateAccountForm
+from CB_control.main.forms import LoginForm, RegistrationForm, UpdateAccountForm, SettingsForm
+from CB_control.main.utils import get_min_sec
 
 import requests
 
@@ -55,10 +56,10 @@ def logout():
 @main.route("/home", methods=['GET', 'POST'])
 @login_required
 def home():
-	request = requests.get(service_ip + '/device_module/get_all')
+	payload = requests.get(service_ip + '/device_module/get_all')
 
-	device_id_list = request.json()["device_id"]
-	location_list = request.json()["location"]
+	device_id_list = payload.json()["device_id"]
+	location_list = payload.json()["location"]
 
 	devices = zip(location_list, device_id_list)
 
@@ -84,8 +85,8 @@ def home():
 @login_required
 def device(id):
 	# Grab device location
-	request = requests.get(service_ip + '/device_module/location/' + str(id))
-	location = request.json()["location"]
+	payload = requests.get(service_ip + '/device_module/location/' + str(id))
+	location = payload.json()["location"]
 
 
 	return render_template("device.html", title="Device", id=id, location=location)
@@ -96,8 +97,8 @@ def device(id):
 @login_required
 def slide_show_pics(id):
 	# Grab device location
-	request = requests.get(service_ip + '/device_module/location/' + str(id))
-	location = request.json()["location"]
+	payload = requests.get(service_ip + '/device_module/location/' + str(id))
+	location = payload.json()["location"]
 
 	return render_template("slide_show_pics.html", title="Slide Show Pictures", location=location)
 
@@ -114,12 +115,72 @@ def upload():
 def remove():
 	return render_template("remove.html", title="Picture Removal")
 
+# Settings for the device
+@main.route("/device/settings/<int:id>", methods=['GET', 'POST'])
+@login_required
+def device_settings(id):
+
+	form = SettingsForm()
+	if form.validate_on_submit():
+		payload = {}
+
+		payload["toggle_pay"] = form.toggle_pay.data
+		payload["price"] = form.price.data
+		# Settings.query.first().charge_time = form.charge_time.data
+		minutes = form.charge_time_min.data
+		seconds = form.charge_time_sec.data
+		payload["charge_time"] = minutes*60 + seconds;
+		payload["time_offset"] = form.time_zone.data
+		payload["location"] = form.location.data
+
+		# Check if aspect ration is different so that it can resize all images
+		# resize = False
+		# if Settings.query.first().aspect_ratio_width != float(form.aspect_ratio.data.split(":")[0]) and \
+		# 	Settings.query.first().aspect_ratio_height != float(form.aspect_ratio.data.split(":")[1]):
+		# 	resize = True
+
+		payload["aspect_ratio_width"] = float(form.aspect_ratio.data.split(":")[0])
+		payload["aspect_ratio_height"] = float(form.aspect_ratio.data.split(":")[1])
+
+		# if resize:
+		# 	pic_files = PFI()
+		# 	pic_files.resize_all(Settings.query.first().aspect_ratio_width, Settings.query.first().aspect_ratio_height)
+
+		# db.session.commit()
+
+		data = jsonify(payload)
+
+		respose = requests.put(service_ip + '/device_module/settings/update/' + str(id), json=payload)
+
+		flash('Settings have been updated!', 'success')
+		return redirect(url_for('main.device_settings', id=id))
+	elif request.method == 'GET':
+		# Grab device settings
+		payload = requests.get(service_ip + '/device_module/settings/' + str(id))
+		settings = payload.json()
+		
+		form.toggle_pay.data = settings["toggle_pay"]
+		form.price.data = settings["price"]
+		minutes, seconds = get_min_sec(seconds=settings["charge_time"])
+		form.charge_time_min.data = minutes
+		form.charge_time_sec.data = seconds
+		form.time_zone.data = settings["time_offset"]
+		form.location.data = settings["location"]
+		# print(settings["aspect_ratio_width"])
+		# print(settings["aspect_ratio_height"])
+		form.aspect_ratio.data = str( int(settings["aspect_ratio_width"]) if (settings["aspect_ratio_width"]).is_integer() else settings["aspect_ratio_width"] ) \
+									+ ":" + str( int(settings["aspect_ratio_height"]) if (settings["aspect_ratio_height"]).is_integer() else settings["aspect_ratio_height"] ) 
+
+	return render_template("settings.html", title="Settings", form=form)
+
+
 # Remove a device from the service
-@main.route("/remove_device/<int:id>")
+@main.route("/device/remove/<int:id>")
 @login_required
 def remove_device(id):
 	# remove the device
-	request = requests.delete(service_ip + '/device_module/remove_device/' + str(id))
+	response = requests.delete(service_ip + '/device_module/remove_device/' + str(id))
+
 	flash('Device has been successfuly removed!', 'success')
 	return redirect(url_for('main.home'))
 

@@ -17,7 +17,7 @@
 		</div>
 
 		<div class="col-md-6 list_container">
-			<h2>Location - {{ location }}</h2>
+			<h2>Location: {{ location }}</h2>
 			<dl class="dl-horizontal" style="padding-left: 10px">
 				<!-- 1 -->
 				<hr>
@@ -27,7 +27,7 @@
 
 				<!-- 2 -->
 				<hr>
-				<dt><a href="#Settings" style="color: black">Settings</a></dt>
+				<dt><a href="{{ url_for('main.device_settings', id=id) }}" style="color: black">Settings</a></dt>
 				<dd>Change the setting of the devices from all, region, or single device at a time.</dd>
 
 
