@@ -160,7 +160,13 @@ def device_settings(id):
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('main.error'))
 
-		flash('Settings have been updated!', 'success')
+		if response.status_code == 204:
+			flash('Settings have been updated!', 'success')
+		elif response.status_code == 400:
+			flash('Server could not find device!', 'danger')
+		else:
+			flash('Something happened and settings were not updated.', 'danger')
+
 		return redirect(url_for('main.device_settings', id=id))
 	elif request.method == 'GET':
 		# Grab device settings
@@ -196,7 +202,13 @@ def remove_device(id):
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('main.error'))
 
-	flash('Device has been successfuly removed!', 'success')
+	if response.status_code == 204:
+		flash('Device has been successfuly removed!', 'success')
+	elif response.status_code == 400:
+		flash('Device was not founf in the server!', 'danger')
+	else:
+		flash("Oops! Something happened and the device was not deleted.", "danger")
+
 	return redirect(url_for('main.home'))
 
 
