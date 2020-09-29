@@ -14,6 +14,12 @@ main = Blueprint('main', __name__)
 def defualt():
 	return redirect(url_for('main.admin_login'))
 
+# Server error redirected page
+@main.route("/error")
+def error():
+	logout_user()
+	return render_template("error.html", title="Error")
+
 # Admin Login
 @main.route("/admin_login", methods=['GET', 'POST'])
 def admin_login():
@@ -56,27 +62,17 @@ def logout():
 @main.route("/home", methods=['GET', 'POST'])
 @login_required
 def home():
-	payload = requests.get(service_ip + '/device_module/get_all')
+	try:
+		payload = requests.get(service_ip + '/device_module/get_all')		
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
 
 	device_id_list = payload.json()["device_id"]
 	location_list = payload.json()["location"]
 
 	devices = zip(location_list, device_id_list)
-
-	# r = requests.post('http://localhost:7000/')
-	# print(r.text)
-
-	# r = requests.put('http://localhost:7000/')
-	# print(r.text)
-
-	# r = requests.patch('http://localhost:7000/')
-	# print(r.text)
-
-	# r = requests.delete('http://localhost:7000/')
-	# print(r.text)
-
-
-
 
 	return render_template("home.html", title="Home", devices=devices)
 
@@ -85,7 +81,12 @@ def home():
 @login_required
 def device(id):
 	# Grab device location
-	payload = requests.get(service_ip + '/device_module/location/' + str(id))
+	try:
+		payload = requests.get(service_ip + '/device_module/location/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
 	location = payload.json()["location"]
 
 
@@ -97,7 +98,12 @@ def device(id):
 @login_required
 def slide_show_pics(id):
 	# Grab device location
-	payload = requests.get(service_ip + '/device_module/location/' + str(id))
+	try:
+		payload = requests.get(service_ip + '/device_module/location/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
 	location = payload.json()["location"]
 
 	return render_template("slide_show_pics.html", title="Slide Show Pictures", location=location)
@@ -147,16 +153,23 @@ def device_settings(id):
 		# 	pic_files.resize_all(Settings.query.first().aspect_ratio_width, Settings.query.first().aspect_ratio_height)
 
 		# db.session.commit()
-
-		data = jsonify(payload)
-
-		respose = requests.put(service_ip + '/device_module/settings/update/' + str(id), json=payload)
+		
+		try:
+			respose = requests.put(service_ip + '/device_module/settings/update/' + str(id), json=payload)
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('main.error'))
 
 		flash('Settings have been updated!', 'success')
 		return redirect(url_for('main.device_settings', id=id))
 	elif request.method == 'GET':
 		# Grab device settings
-		payload = requests.get(service_ip + '/device_module/settings/' + str(id))
+		try:
+			payload = requests.get(service_ip + '/device_module/settings/' + str(id))
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('main.error'))
+
 		settings = payload.json()
 		
 		form.toggle_pay.data = settings["toggle_pay"]
@@ -166,8 +179,6 @@ def device_settings(id):
 		form.charge_time_sec.data = seconds
 		form.time_zone.data = settings["time_offset"]
 		form.location.data = settings["location"]
-		# print(settings["aspect_ratio_width"])
-		# print(settings["aspect_ratio_height"])
 		form.aspect_ratio.data = str( int(settings["aspect_ratio_width"]) if (settings["aspect_ratio_width"]).is_integer() else settings["aspect_ratio_width"] ) \
 									+ ":" + str( int(settings["aspect_ratio_height"]) if (settings["aspect_ratio_height"]).is_integer() else settings["aspect_ratio_height"] ) 
 
@@ -179,7 +190,11 @@ def device_settings(id):
 @login_required
 def remove_device(id):
 	# remove the device
-	response = requests.delete(service_ip + '/device_module/remove_device/' + str(id))
+	try:
+		response = requests.delete(service_ip + '/device_module/remove_device/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
 
 	flash('Device has been successfuly removed!', 'success')
 	return redirect(url_for('main.home'))
