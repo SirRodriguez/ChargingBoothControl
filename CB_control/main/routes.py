@@ -2,7 +2,8 @@ from flask import render_template, Blueprint, url_for, redirect, flash, request,
 from flask_login import login_user, current_user, logout_user, login_required
 from CB_control import bcrypt, db, service_ip
 from CB_control.models import AdminUser
-from CB_control.main.forms import LoginForm, RegistrationForm, UpdateAccountForm, SettingsForm
+from CB_control.main.forms import (LoginForm, RegistrationForm, UpdateAccountForm, SettingsForm,
+									SlideShowPicsForm)
 from CB_control.main.utils import get_min_sec
 
 import requests
@@ -106,20 +107,51 @@ def slide_show_pics(id):
 
 	location = payload.json()["location"]
 
-	return render_template("slide_show_pics.html", title="Slide Show Pictures", location=location)
+	return render_template("slide_show_pics.html", title="Slide Show Pictures", location=location, id=id)
 
 # Slide Show Pictures: Upload
-@main.route("/slide_show_pics/upload")
+@main.route("/slide_show_pics/upload/<int:id>", methods=['GET', 'POST'])
 @login_required
-def upload():
-	return render_template("upload.html", title="Picture Upload")
+def upload(id):
+	# Grab device location
+	try:
+		payload = requests.get(service_ip + '/device_module/location/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
+	location = payload.json()["location"]
+
+	form = SlideShowPicsForm()
+	if form.validate_on_submit():
+		image_files = []
+		for file in form.picture.data:
+			image_files.append(('image', ( file.filename, file.read() )  ))
+			print(file.filename)
+
+		# Do the post here
+		response = requests.post(service_ip + '/device_module/images/upload/' + str(id), files=image_files)
+
+		flash('Pictures has been uploaded', 'success')
+		return redirect(url_for('main.upload', id=id))
+
+	return render_template("upload.html", title="Picture Upload", location=location, form=form)
 
 
 # Slide Show Pictures: Remove
-@main.route("/slide_show_pics/remove")
+@main.route("/slide_show_pics/remove/<int:id>")
 @login_required
-def remove():
-	return render_template("remove.html", title="Picture Removal")
+def remove(id):
+	# Grab device location
+	try:
+		payload = requests.get(service_ip + '/device_module/location/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
+	location = payload.json()["location"]
+
+	return render_template("remove.html", title="Picture Removal", location=location)
 
 # Settings for the device
 @main.route("/device/settings/<int:id>", methods=['GET', 'POST'])

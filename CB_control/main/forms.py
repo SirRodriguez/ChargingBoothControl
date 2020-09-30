@@ -1,5 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import (StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField,
+						MultipleFileField)
 from wtforms.validators import (DataRequired, Length, Email, EqualTo, ValidationError, InputRequired,
 								NumberRange)
 from flask_login import current_user
@@ -64,3 +66,8 @@ class SettingsForm(FlaskForm):
 	aspect_ratio = SelectField('Aspect Ratio', choices=aspect_ratio_list)
 
 	submit = SubmitField('Update Settings')
+
+# Slide Show Pictures
+class SlideShowPicsForm(FlaskForm):
+	picture = MultipleFileField('Upload Pictures', validators=[DataRequired(), FileAllowed(['jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp', 'png'])])
+	submit = SubmitField('Upload Picture')
