@@ -3,8 +3,8 @@ from flask_login import login_user, current_user, logout_user, login_required
 from CB_control import bcrypt, db, service_ip
 from CB_control.models import AdminUser
 from CB_control.main.forms import (LoginForm, RegistrationForm, UpdateAccountForm, SettingsForm,
-									SlideShowPicsForm)
-from CB_control.main.utils import get_min_sec
+									SlideShowPicsForm, RemovePictureForm)
+from CB_control.main.utils import get_min_sec, removals_json
 
 import requests
 
@@ -18,7 +18,7 @@ def defualt():
 # Server error redirected page
 @main.route("/error")
 def error():
-	logout_user()
+	# logout_user()
 	return render_template("error.html", title="Error")
 
 # Admin Login
@@ -113,14 +113,18 @@ def slide_show_pics(id):
 @main.route("/slide_show_pics/upload/<int:id>", methods=['GET', 'POST'])
 @login_required
 def upload(id):
-	# Grab device location
+	# Grab device location and image number
 	try:
-		payload = requests.get(service_ip + '/device_module/location/' + str(id))
+		# payload = requests.get(service_ip + '/device_module/location/' + str(id))
+		payload = requests.get(service_ip + '/device_module/location_image_count/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('main.error'))
 
-	location = payload.json()["location"]
+	payload_json = payload.json()
+	location = payload_json["location"]
+	image_count = payload_json["image_count"]
+	# print(image_count)
 
 	form = SlideShowPicsForm()
 	if form.validate_on_submit():
@@ -135,23 +139,47 @@ def upload(id):
 		flash('Pictures has been uploaded', 'success')
 		return redirect(url_for('main.upload', id=id))
 
-	return render_template("upload.html", title="Picture Upload", location=location, form=form)
+	return render_template("upload.html", title="Picture Upload", location=location, form=form, service_ip=service_ip, id=id, image_count=image_count)
 
 
 # Slide Show Pictures: Remove
-@main.route("/slide_show_pics/remove/<int:id>")
+@main.route("/slide_show_pics/remove/<int:id>", methods=['GET', 'POST'])
 @login_required
 def remove(id):
-	# Grab device location
+	# Grab device location and image count
 	try:
-		payload = requests.get(service_ip + '/device_module/location/' + str(id))
+		# payload = requests.get(service_ip + '/device_module/location/' + str(id))
+		payload = requests.get(service_ip + '/device_module/location_image_count/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('main.error'))
 
-	location = payload.json()["location"]
+	payload_json = payload.json()
+	location = payload_json["location"]
+	image_count = payload_json["image_count"]
 
-	return render_template("remove.html", title="Picture Removal", location=location)
+	form = RemovePictureForm()
+	if form.validate_on_submit():
+		# Post a delete image files here
+
+		# removals = removals_json(form.removals.data)
+
+		try:
+			print("in try")
+			response = requests.delete(service_ip + '/device_module/remove_images/' + str(id) + '/' + form.removals.data)
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('main.error'))
+
+		if response.status_code == 204:
+			flash('Images have been successfuly removed! Refresh your browser if there is no change.', 'success')
+		elif response.status_code == 400:
+			flash('Image was not found in the server!', 'danger')
+		else:
+			flash("Oops! Something happened and the images were not deleted.", "danger")
+		
+
+	return render_template("remove.html", title="Picture Removal", location=location, form=form, service_ip=service_ip, id=id, image_count=image_count)
 
 # Settings for the device
 @main.route("/device/settings/<int:id>", methods=['GET', 'POST'])
@@ -187,12 +215,12 @@ def device_settings(id):
 		# db.session.commit()
 		
 		try:
-			respose = requests.put(service_ip + '/device_module/settings/update/' + str(id), json=payload)
+			response = requests.put(service_ip + '/device_module/settings/update/' + str(id), json=payload)
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('main.error'))
 
-		if response.status_code == 204:
+		if response.status_code == 204 or response.status_code == 200:
 			flash('Settings have been updated!', 'success')
 		elif response.status_code == 400:
 			flash('Server could not find device!', 'danger')
@@ -237,7 +265,7 @@ def remove_device(id):
 	if response.status_code == 204:
 		flash('Device has been successfuly removed!', 'success')
 	elif response.status_code == 400:
-		flash('Device was not founf in the server!', 'danger')
+		flash('Device was not found in the server!', 'danger')
 	else:
 		flash("Oops! Something happened and the device was not deleted.", "danger")
 

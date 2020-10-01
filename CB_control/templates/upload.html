@@ -29,18 +29,25 @@
 	</form>
 
 
-	<!-- <div class="row">
+	<div class="row">
 
-      	{% for pic_file in pic_files %}
+		{% if image_count == 0 %}
+			<ul>
+				<div>No Images</div>
+			</ul>
+		{% endif %}
+
+
+      	{% for i in range(image_count) %}
         
 	        <ul>
 	          <div>
-	            <img src="{{ url_for('static', filename='picture_files/' + pic_file) }}" style="width: 100%; max-width: 300px; height: auto">
+	            <img src="{{service_ip}}/device_module/grab_image/{{id}}/{{i}}" style="width: 100%; max-width: 300px; height: auto">
 	          </div>
 	      	</ul>
         
     	{% endfor %}
 
-    </div> -->
+    </div>
 
 {% endblock content %}
