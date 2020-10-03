@@ -64,7 +64,7 @@ def logout():
 @login_required
 def home():
 	try:
-		payload = requests.get(service_ip + '/device_module/get_all')		
+		payload = requests.get(service_ip + '/site/get_all')		
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('main.error'))
@@ -83,7 +83,7 @@ def home():
 def device(id):
 	# Grab device location
 	try:
-		payload = requests.get(service_ip + '/device_module/location/' + str(id))
+		payload = requests.get(service_ip + '/site/location/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('main.error'))
@@ -100,7 +100,7 @@ def device(id):
 def slide_show_pics(id):
 	# Grab device location
 	try:
-		payload = requests.get(service_ip + '/device_module/location/' + str(id))
+		payload = requests.get(service_ip + '/site/location/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('main.error'))
@@ -115,8 +115,8 @@ def slide_show_pics(id):
 def upload(id):
 	# Grab device location and image number
 	try:
-		# payload = requests.get(service_ip + '/device_module/location/' + str(id))
-		payload = requests.get(service_ip + '/device_module/location_image_count/' + str(id))
+		# payload = requests.get(service_ip + '/site/location/' + str(id))
+		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('main.error'))
@@ -134,7 +134,7 @@ def upload(id):
 			print(file.filename)
 
 		# Do the post here
-		response = requests.post(service_ip + '/device_module/images/upload/' + str(id), files=image_files)
+		response = requests.post(service_ip + '/site/images/upload/' + str(id), files=image_files)
 
 		flash('Pictures has been uploaded', 'success')
 		return redirect(url_for('main.upload', id=id))
@@ -148,8 +148,8 @@ def upload(id):
 def remove(id):
 	# Grab device location and image count
 	try:
-		# payload = requests.get(service_ip + '/device_module/location/' + str(id))
-		payload = requests.get(service_ip + '/device_module/location_image_count/' + str(id))
+		# payload = requests.get(service_ip + '/site/location/' + str(id))
+		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('main.error'))
@@ -166,7 +166,7 @@ def remove(id):
 
 		try:
 			print("in try")
-			response = requests.delete(service_ip + '/device_module/remove_images/' + str(id) + '/' + form.removals.data)
+			response = requests.delete(service_ip + '/site/remove_images/' + str(id) + '/' + form.removals.data)
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('main.error'))
@@ -215,7 +215,7 @@ def device_settings(id):
 		# db.session.commit()
 		
 		try:
-			response = requests.put(service_ip + '/device_module/settings/update/' + str(id), json=payload)
+			response = requests.put(service_ip + '/site/settings/update/' + str(id), json=payload)
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('main.error'))
@@ -231,7 +231,7 @@ def device_settings(id):
 	elif request.method == 'GET':
 		# Grab device settings
 		try:
-			payload = requests.get(service_ip + '/device_module/settings/' + str(id))
+			payload = requests.get(service_ip + '/site/settings/' + str(id))
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('main.error'))
@@ -257,7 +257,7 @@ def device_settings(id):
 def remove_device(id):
 	# remove the device
 	try:
-		response = requests.delete(service_ip + '/device_module/remove_device/' + str(id))
+		response = requests.delete(service_ip + '/site/remove_device/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('main.error'))
