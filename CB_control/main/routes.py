@@ -4,7 +4,7 @@ from CB_control import bcrypt, db, service_ip
 from CB_control.models import AdminUser
 from CB_control.main.forms import (LoginForm, RegistrationForm, UpdateAccountForm, SettingsForm,
 									SlideShowPicsForm, RemovePictureForm)
-from CB_control.main.utils import get_min_sec, removals_json
+from CB_control.main.utils import get_min_sec, removals_json, get_offset_dates_initiated
 
 import requests
 
@@ -249,6 +249,119 @@ def device_settings(id):
 									+ ":" + str( int(settings["aspect_ratio_height"]) if (settings["aspect_ratio_height"]).is_integer() else settings["aspect_ratio_height"] ) 
 
 	return render_template("settings.html", title="Settings", form=form)
+
+
+# Device data
+@main.route("/device/data/<int:id>")
+@login_required
+def data(id):
+	# Grab device location
+	try:
+		payload = requests.get(service_ip + '/site/location/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
+	location = payload.json()["location"]
+
+	return render_template("data.html", title="Data", location=location, id=id)
+
+
+
+
+# @system_admin.route("/system_admin/list_data")
+# @login_required
+# def view_data():
+# 	# Check if registered
+# 	if not is_registered():
+# 		return redirect(url_for('register.home'))
+
+# 	devi_id_number = Device_ID.query.first().id_number
+
+# 	page = request.args.get('page', 1, type=int)
+
+# 	# sessions = Session.query.order_by(Session.date_initiated.desc()).paginate(page=page, per_page=10)
+
+# 	try:
+# 		payload = requests.get(service_ip + '/device/sessions/' + devi_id_number + '/' + str(page))
+# 	except:
+# 		flash("Unable to Connect to Server!", "danger")
+# 		return redirect(url_for('register.error'))
+
+# 	# Later combine the two requests to speed up
+# 	try:
+# 		payload_sett = requests.get(service_ip + '/device/get_settings/' + devi_id_number)
+# 	except:
+# 		flash("Unable to Connect to Server!", "danger")
+# 		return redirect(url_for('register.error'))
+
+# 	pl_json = payload.json()
+# 	sess_list = pl_json["sessions"]
+# 	iter_pages = pl_json["iter_pages"]
+
+# 	# Get the settings
+# 	settings = payload_sett.json()
+
+# 	# print(sess_map)
+# 	# print(iter_pages)
+
+
+# 	# date_strings = get_offset_dates_initiated(sessions=sessions.items,
+# 	# 								time_offset=Settings.query.first().time_offset)
+# 	date_strings = get_offset_dates_initiated(sessions=sess_list,
+# 									time_offset=settings["time_offset"])
+
+# 	sessions_and_dates = zip(sess_list, date_strings) # Pack them together to iterate simultaniously
+# 	return render_template("system_admin/list_data.html", title="List Data", iter_pages=iter_pages, 
+# 							page=page, sessions_and_dates=sessions_and_dates)
+
+
+
+# List Data
+@main.route("/device/list_data/<int:id>")
+@login_required
+def list_data(id):
+	# Grab device location
+	try:
+		payload = requests.get(service_ip + '/site/location/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
+	location = payload.json()["location"]
+
+	# Grab the device data listed 
+
+	# Pagination page
+	page = request.args.get('page', 1, type=int)
+
+	try:
+		payload = requests.get(service_ip + '/site/sessions/' + str(id) + '/' + str(page))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('register.error'))
+
+	# Later combine the two requests to speed up
+	try:
+		payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('register.error'))
+
+	pl_json = payload.json()
+	sess_list = pl_json["sessions"]
+	iter_pages = pl_json["iter_pages"]
+
+	# Get the settings
+	settings = payload_sett.json()
+
+	date_strings = get_offset_dates_initiated(sessions=sess_list,
+									time_offset=settings["time_offset"])
+
+	sessions_and_dates = zip(sess_list, date_strings) # Pack them together to iterate simultaniously
+	return render_template("list_data.html", title="List Data", iter_pages=iter_pages, 
+							page=page, sessions_and_dates=sessions_and_dates, id=id)
+
 
 
 # Remove a device from the service

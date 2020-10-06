@@ -1,4 +1,7 @@
 from flask import jsonify
+from datetime import datetime, timedelta
+from pytz import timezone
+import pytz
 
 def get_min_sec(seconds):
 	minutes = seconds // 60
@@ -25,3 +28,26 @@ def removals_json(removals):
 	resp = jsonify(payload)
 	# resp.status_code = 200
 	return resp
+
+def get_offset_dates_initiated(sessions, time_offset):
+	fmt = '%b %d, %Y - %I:%M:%S %p'
+	dates = []
+
+	zone = timezone(time_offset)
+	for session in sessions:
+		# utc_time = pytz.utc.localize(session.date_initiated)
+		date_initiated=datetime(
+			year=session["date_initiated_year"],
+			month=session["date_initiated_month"],
+			day=session["date_initiated_day"], 
+			hour=session["date_initiated_hour"], 
+			minute=session["date_initiated_minute"],
+			second=session["date_initiated_second"]
+			)
+
+		utc_time = pytz.utc.localize(date_initiated)
+		local_time = utc_time.astimezone(zone)
+
+		dates.append(local_time.strftime(fmt))
+
+	return dates

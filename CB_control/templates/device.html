@@ -33,14 +33,14 @@
 
 				<!-- 3 -->
 				<hr>
-				<dt><a href="#Data" style="color: black">Data</a></dt>
+				<dt><a href="{{ url_for('main.data', id=id) }}" style="color: black">Data</a></dt>
 				<dd>View data recorded from devices.</dd>
 
 				<!-- Remove device section -->
 				<hr>
 				<hr>
 				<dt><a href="{{ url_for('main.remove_device', id=id) }}" style="color: red">Remove Device</a></dt>
-				<dd>Permanently removes the device from the service. All settings will be lost and images associated with it! The removed device will need to reregister to the service.</dd>
+				<dd>Permanently removes the device from the service. All settings will be lost and images associated with it along with the data! The removed device will need to reregister to the service.</dd>
 
 
 				<!-- Account will be its own separate thing -->

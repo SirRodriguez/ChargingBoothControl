@@ -1,0 +1,36 @@
+{% extends "defualt_layout.html" %}
+
+{% block topbar %}
+	
+	<div class="col-md-8" style="text-align: right"><h4><a href="{{ url_for('main.logout') }}" style="color: black">Logout</a></h4></div>
+
+{% endblock topbar %}
+
+{% block content %}
+
+	<!-- List of Picture settings to go to -->
+	<div class="row" style="padding-top: 10vh">
+		<!-- offset by 1 -->
+		<div class="col-md-1">
+		</div>
+
+		<div class="col-md-4 list_container">
+			<h2>Location - {{ location }}</h2>
+			<dl class="dl-horizontal" style="padding-left: 10px">
+				<!-- 1 -->
+				<hr>
+				<dt><a href="{{ url_for('main.list_data', id=id) }}" style="color: black">List Data</a></dt>
+				<dd>All session are listed out.</dd>
+
+
+				<!-- 2 -->
+				<hr>
+				<dt><a href="#" style="color: black">Graph Data</a></dt>
+				<dd>Data is graphically shown by dates.</dd>
+
+				<hr>
+			</dl>
+		</div>
+	</div>
+
+{% endblock content %}
