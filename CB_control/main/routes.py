@@ -5,7 +5,8 @@ from CB_control.models import AdminUser
 from CB_control.main.forms import (LoginForm, RegistrationForm, UpdateAccountForm, SettingsForm,
 									SlideShowPicsForm, RemovePictureForm, YearForm)
 from CB_control.main.utils import (get_min_sec, removals_json, get_offset_dates_initiated, remove_png, 
-									count_years, create_bar_years, save_figure)
+									count_years, create_bar_years, save_figure, count_months,
+									create_bar_months)
 
 import matplotlib
 matplotlib.use('Agg')
@@ -395,9 +396,49 @@ def graph_year(id):
 	location = payload.json()["location"]
 
 	form = YearForm()
+	if form.validate_on_submit():
+		# Grab the sessions
+		# sessions = Session.query.all()
+		try:
+			payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('register.error'))
+
+		# Later combine the two requests to speed up
+		try:
+			payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('register.error'))
+
+		
+		# Get the sessions
+		sess_list = payload.json()["sessions"]
+
+		# Get the settings
+		settings = payload_sett.json()
 
 
-	return render_template("graph_year.html", title="All Years", id=id, location=location)
+		# Delete old pic files
+		remove_png()
+
+		# This is what will be used for the bar graph
+		date_strings = get_offset_dates_initiated(sessions=sess_list,
+									time_offset=settings["time_offset"])
+
+		# For every month in the given year, count how many sessions occured
+		# returns a dictionary
+		months = count_months(dates=date_strings, year=form.year.data)
+
+		create_bar_months(months=months, year=form.year.data)
+
+		# Create the pic file to show
+		pic_name = save_figure()
+
+		return render_template("graph_year.html", title="All Years", id=id, location=location, form=form, pic_name=pic_name)
+
+	return render_template("graph_year.html", title="All Years", id=id, location=location, form=form)
 
 @main.route("/device/graph_data/month/<int:id>", methods=['GET', 'POST'])
 @login_required

@@ -96,3 +96,45 @@ def save_figure():
 	plt.savefig(pic_path)
 
 	return fig_name
+
+def count_months(dates, year):
+	# initialize the months
+	months = {
+		'Jan' : 0,
+		'Feb' : 0,
+		'Mar' : 0,
+		'Apr' : 0,
+		'May' : 0,
+		'Jun' : 0,
+		'Jul' : 0,
+		'Aug' : 0,
+		'Sep' : 0,
+		'Oct' : 0,
+		'Nov' : 0,
+		'Dec' : 0
+	}
+
+	# Grab the sessions in each month
+	for date in dates:
+		date_list = date.split(" ")
+		yr = date_list[2]
+
+		if yr == year:
+			mth = date_list[0]
+			months[mth] += 1
+
+	return months
+
+def create_bar_months(months, year):
+	mth = list(months.keys())
+	vls = list(months.values())
+
+	fig = plt.figure(figsize = (10, 5))
+
+	# Create the bar plot
+	plt.bar(mth, vls)
+
+	# Set the labels
+	plt.title("Number of Sessions for " + year, fontsize=20)
+	plt.ylabel("Number of Sessions", fontsize=15)
+	plt.xlabel("Month", fontsize=15)
