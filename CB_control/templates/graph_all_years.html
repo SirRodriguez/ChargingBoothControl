@@ -1,0 +1,15 @@
+{% extends "defualt_layout.html" %}
+
+{% block topbar %}
+	
+	<div class="col-md-8" style="text-align: right"><h4><a href="{{ url_for('main.logout') }}" style="color: black">Logout</a></h4></div>
+
+{% endblock topbar %}
+
+{% block content %}
+
+	<h1>Graph All Years</h1>
+
+	<img src="{{ url_for('static', filename='data_files/' + pic_name) }}">
+
+{% endblock content %}

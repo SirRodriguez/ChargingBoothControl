@@ -3,9 +3,13 @@ from flask_login import login_user, current_user, logout_user, login_required
 from CB_control import bcrypt, db, service_ip
 from CB_control.models import AdminUser
 from CB_control.main.forms import (LoginForm, RegistrationForm, UpdateAccountForm, SettingsForm,
-									SlideShowPicsForm, RemovePictureForm)
-from CB_control.main.utils import get_min_sec, removals_json, get_offset_dates_initiated
+									SlideShowPicsForm, RemovePictureForm, YearForm)
+from CB_control.main.utils import (get_min_sec, removals_json, get_offset_dates_initiated, remove_png, 
+									count_years, create_bar_years, save_figure)
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import requests
 
 main = Blueprint('main', __name__)
@@ -268,55 +272,6 @@ def data(id):
 
 
 
-
-# @system_admin.route("/system_admin/list_data")
-# @login_required
-# def view_data():
-# 	# Check if registered
-# 	if not is_registered():
-# 		return redirect(url_for('register.home'))
-
-# 	devi_id_number = Device_ID.query.first().id_number
-
-# 	page = request.args.get('page', 1, type=int)
-
-# 	# sessions = Session.query.order_by(Session.date_initiated.desc()).paginate(page=page, per_page=10)
-
-# 	try:
-# 		payload = requests.get(service_ip + '/device/sessions/' + devi_id_number + '/' + str(page))
-# 	except:
-# 		flash("Unable to Connect to Server!", "danger")
-# 		return redirect(url_for('register.error'))
-
-# 	# Later combine the two requests to speed up
-# 	try:
-# 		payload_sett = requests.get(service_ip + '/device/get_settings/' + devi_id_number)
-# 	except:
-# 		flash("Unable to Connect to Server!", "danger")
-# 		return redirect(url_for('register.error'))
-
-# 	pl_json = payload.json()
-# 	sess_list = pl_json["sessions"]
-# 	iter_pages = pl_json["iter_pages"]
-
-# 	# Get the settings
-# 	settings = payload_sett.json()
-
-# 	# print(sess_map)
-# 	# print(iter_pages)
-
-
-# 	# date_strings = get_offset_dates_initiated(sessions=sessions.items,
-# 	# 								time_offset=Settings.query.first().time_offset)
-# 	date_strings = get_offset_dates_initiated(sessions=sess_list,
-# 									time_offset=settings["time_offset"])
-
-# 	sessions_and_dates = zip(sess_list, date_strings) # Pack them together to iterate simultaniously
-# 	return render_template("system_admin/list_data.html", title="List Data", iter_pages=iter_pages, 
-# 							page=page, sessions_and_dates=sessions_and_dates)
-
-
-
 # List Data
 @main.route("/device/list_data/<int:id>")
 @login_required
@@ -363,6 +318,114 @@ def list_data(id):
 							page=page, sessions_and_dates=sessions_and_dates, id=id)
 
 
+@main.route("/device/graph_data/<int:id>")
+@login_required
+def graph_data(id):
+	# Grab device location
+	try:
+		payload = requests.get(service_ip + '/site/location/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
+	location = payload.json()["location"]
+
+	return render_template("graph_data.html", title="Graph Data", location=location, id=id)
+
+@main.route("/device/graph_data/all_years/<int:id>")
+@login_required
+def graph_all_years(id):
+	# Grab device location
+	try:
+		payload = requests.get(service_ip + '/site/location/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
+	location = payload.json()["location"]
+
+	# Grab the sessions
+	try:
+		payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('register.error'))
+
+	# Get the sessions
+	sess_list = payload.json()["sessions"]
+
+	# Later combine the two requests to speed up
+	try:
+		payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('register.error'))
+
+	# Get the settings
+	settings = payload_sett.json()
+
+	# Delete old pic files
+	remove_png()
+
+	# This is what will be used for the bar graph
+	date_strings = get_offset_dates_initiated(sessions=sess_list,
+									time_offset=settings["time_offset"])
+
+	# For every year, count how many sessions occured
+	# Returns a dictionary
+	years = count_years(dates=date_strings)
+
+	create_bar_years(years=years)
+
+	# Create the pic file to show
+	pic_name = save_figure()
+
+	return render_template("graph_all_years.html", title="All Years", id=id, location=location, pic_name=pic_name)
+
+@main.route("/device/graph_data/year/<int:id>", methods=['GET', 'POST'])
+@login_required
+def graph_year(id):
+	# Grab device location
+	try:
+		payload = requests.get(service_ip + '/site/location/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
+	location = payload.json()["location"]
+
+	form = YearForm()
+
+
+	return render_template("graph_year.html", title="All Years", id=id, location=location)
+
+@main.route("/device/graph_data/month/<int:id>", methods=['GET', 'POST'])
+@login_required
+def graph_month(id):
+	# Grab device location
+	try:
+		payload = requests.get(service_ip + '/site/location/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
+	location = payload.json()["location"]
+
+	return render_template("graph_month.html", title="All Years", id=id, location=location)
+
+@main.route("/device/graph_data/month/<int:id>", methods=['GET', 'POST'])
+@login_required
+def graph_day(id):
+	# Grab device location
+	try:
+		payload = requests.get(service_ip + '/site/location/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
+	location = payload.json()["location"]
+
+	return render_template("graph_day.html", title="All Years", id=id, location=location)
 
 # Remove a device from the service
 @main.route("/device/remove/<int:id>")

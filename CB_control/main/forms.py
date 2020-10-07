@@ -82,3 +82,15 @@ class RemovePictureForm(FlaskForm):
 		valid_characters = set(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', ','])
 		if not all(x in valid_characters for x in removals.data):
 			raise ValidationError("Characters must only be numbers and commas. No white spaces")
+
+# Graph Year form
+class YearForm(FlaskForm):
+	year = StringField('Year YYYY', validators=[DataRequired()])
+	submit = SubmitField('Apply')
+
+	def validate_year(self, year):
+		valid_characters = set(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'])
+		if not all(x in valid_characters for x in year.data):
+			raise ValidationError("Numbers are only valid")
+		elif len(year.data) != 4:
+			raise ValidationError('Must be in the format YYYY')

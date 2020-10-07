@@ -1,7 +1,12 @@
-from flask import jsonify
+from flask import jsonify, current_app
 from datetime import datetime, timedelta
 from pytz import timezone
 import pytz
+import os
+from os import listdir
+from os.path import isfile, join
+import matplotlib.pyplot as plt
+import secrets
 
 def get_min_sec(seconds):
 	minutes = seconds // 60
@@ -51,3 +56,43 @@ def get_offset_dates_initiated(sessions, time_offset):
 		dates.append(local_time.strftime(fmt))
 
 	return dates
+
+def remove_png():
+	files_path = os.path.join(current_app.root_path, 'static', 'data_files')
+	files = [f for f in listdir(files_path) if isfile(join(files_path, f))]
+	for file in files:
+		f_name, f_ext = os.path.splitext(file)
+		if f_ext == ".png":
+			full_path = os.path.join(current_app.root_path, 'static', 'data_files', file)
+			os.remove(full_path)
+
+def count_years(dates):
+	years = {}
+
+	for date in dates:
+		yr = date.split(" ")[2]
+		years[yr] = years.get(yr, 0) + 1
+
+
+	return years
+
+def create_bar_years(years):
+	yrs = list(years.keys())
+	vls = list(years.values())
+
+	fig = plt.figure(figsize = (10, 5))
+
+	# Create the bar plot
+	plt.bar(yrs, vls)
+
+	# Set the labels
+	plt.title("Number of Sessions for each year", fontsize=20)
+	plt.ylabel("Number of Sessions", fontsize=15)
+	plt.xlabel("Year", fontsize=15)
+
+def save_figure():
+	fig_name = secrets.token_hex(8) + ".png"
+	pic_path = os.path.join(current_app.root_path, 'static', 'data_files', fig_name)
+	plt.savefig(pic_path)
+
+	return fig_name
