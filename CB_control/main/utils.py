@@ -190,3 +190,62 @@ def create_bar_days(days, month, year):
 	plt.title("Number of Sessions for " + month + ", " + year, fontsize=20)
 	plt.ylabel("Number of Sessions", fontsize=15)
 	plt.xlabel("Day", fontsize=15)
+
+def count_hours(dates, day, month, year):
+
+	hours = {
+		# Reversed AM and Pm so that the plot shows the right way
+		'11PM' : 0,
+		'10PM' : 0,
+		'09PM' : 0,
+		'08PM' : 0,
+		'07PM' : 0,
+		'06PM' : 0,
+		'05PM' : 0,
+		'04PM' : 0,
+		'03PM' : 0,
+		'02PM' : 0,
+		'01PM' : 0,
+		'12PM' : 0,
+		
+		'11AM' : 0,
+		'10AM' : 0,
+		'09AM' : 0,
+		'08AM' : 0,
+		'07AM' : 0,
+		'06AM' : 0,
+		'05AM' : 0,
+		'04AM' : 0,
+		'03AM' : 0,
+		'02AM' : 0,
+		'01AM' : 0,
+		'12AM' : 0,
+	}
+
+	for date in dates:
+		date_list = date.split(" ")
+		yr = date_list[2]
+		mth = date_list[0]
+		dy = date_list[1][:-1]
+
+		if yr == year and mth == month and dy == day:
+			hr = date.split(" ")[4].split(":")[0]
+			hrm = hr + date.split(" ")[5]
+			hours[hrm] += 1
+
+	return hours
+	
+
+def create_bar_hours(hours, day, month, year):
+	hrs = list(hours.keys())
+	vls = list(hours.values())
+
+	fig = plt.figure(figsize = (10, 5))
+
+	# Create the bar plot
+	plt.barh(hrs, vls)
+
+	# Set the labels
+	plt.title("Number of Sessions for " + month + " " + day + ", " + year, fontsize=20)
+	plt.ylabel("Hour", fontsize=15)
+	plt.xlabel("Number of Sessions", fontsize=15)
