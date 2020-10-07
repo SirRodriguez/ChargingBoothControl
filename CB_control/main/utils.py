@@ -138,3 +138,55 @@ def create_bar_months(months, year):
 	plt.title("Number of Sessions for " + year, fontsize=20)
 	plt.ylabel("Number of Sessions", fontsize=15)
 	plt.xlabel("Month", fontsize=15)
+
+def count_days(dates, year, month):
+	# This is to get how many days each month has
+	days_of_months = {
+		'Jan' : 31,
+		'Feb' : 29, # Because of leap year, it has 29
+		'Mar' : 31,
+		'Apr' : 30,
+		'May' : 31,
+		'Jun' : 30,
+		'Jul' : 31,
+		'Aug' : 31,
+		'Sep' : 30,
+		'Oct' : 31,
+		'Nov' : 30,
+		'Dec' : 31
+	}
+
+	# initialize days
+	days = {}
+	for d in range(days_of_months[month]):
+		days[d+1] = 0
+
+	# Grab the sessions for the month
+	for date in dates:
+		date_list = date.split(" ")
+		yr = date_list[2]
+		mth = date_list[0]
+
+		if yr == year and mth == month:
+			dy = int(date_list[1][:-1])
+			days[dy] += 1
+
+
+	return days
+
+def create_bar_days(days, month, year):
+	dys = list(days.keys())
+	vls = list(days.values())
+
+	fig = plt.figure(figsize = (10, 5))
+
+	# Create the bar plot
+	plt.bar(dys, vls)
+
+	# Make sure all x ticks show
+	plt.xticks(dys)
+
+	# Set the labels
+	plt.title("Number of Sessions for " + month + ", " + year, fontsize=20)
+	plt.ylabel("Number of Sessions", fontsize=15)
+	plt.xlabel("Day", fontsize=15)

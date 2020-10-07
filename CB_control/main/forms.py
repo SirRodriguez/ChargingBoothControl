@@ -94,3 +94,27 @@ class YearForm(FlaskForm):
 			raise ValidationError("Numbers are only valid")
 		elif len(year.data) != 4:
 			raise ValidationError('Must be in the format YYYY')
+
+# Graph month form
+class MonthForm(FlaskForm):
+	year = StringField('Year YYYY', validators=[DataRequired()])
+	month = StringField('Month (ex Sep)', validators=[DataRequired()])
+	submit = SubmitField('Apply')
+
+	def validate_year(self, year):
+		valid_characters = set(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'])
+		if not all(x in valid_characters for x in year.data):
+			raise ValidationError("Numbers are only valid")
+		elif len(year.data) != 4:
+			raise ValidationError('Must be in the format YYYY')
+
+	def validate_month(self, month):
+		valid_months = set(['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+
+		valid = False
+		for m in valid_months:
+			if month.data == m:
+				valid = True
+
+		if not valid:
+			raise ValidationError("Must be one of these: 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'")

@@ -3,10 +3,10 @@ from flask_login import login_user, current_user, logout_user, login_required
 from CB_control import bcrypt, db, service_ip
 from CB_control.models import AdminUser
 from CB_control.main.forms import (LoginForm, RegistrationForm, UpdateAccountForm, SettingsForm,
-									SlideShowPicsForm, RemovePictureForm, YearForm)
+									SlideShowPicsForm, RemovePictureForm, YearForm, MonthForm)
 from CB_control.main.utils import (get_min_sec, removals_json, get_offset_dates_initiated, remove_png, 
 									count_years, create_bar_years, save_figure, count_months,
-									create_bar_months)
+									create_bar_months, count_days, create_bar_days)
 
 import matplotlib
 matplotlib.use('Agg')
@@ -452,7 +452,49 @@ def graph_month(id):
 
 	location = payload.json()["location"]
 
-	return render_template("graph_month.html", title="All Years", id=id, location=location)
+	form = MonthForm()
+	if form.validate_on_submit():
+		# Grab the sessions
+		# sessions = Session.query.all()
+		try:
+			payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('register.error'))
+
+		# Later combine the two requests to speed up
+		try:
+			payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('register.error'))
+
+		
+		# Get the sessions
+		sess_list = payload.json()["sessions"]
+
+		# Get the settings
+		settings = payload_sett.json()
+
+		# Delete old pic files
+		remove_png()
+
+		# This is what will be used for the bar graph
+		date_strings = get_offset_dates_initiated(sessions=sess_list,
+									time_offset=settings["time_offset"])
+
+		# For every day in a given month of a given year, count how many sessions occured
+		# Returns a dictionary
+		days = count_days(dates=date_strings, year=form.year.data, month=form.month.data)
+
+		create_bar_days(days=days, month=form.month.data, year=form.year.data)
+
+		# Create the pic file to show
+		pic_name = save_figure()
+
+		return render_template("graph_month.html", title="All Years", id=id, location=location, form=form, pic_name=pic_name)
+
+	return render_template("graph_month.html", title="All Years", id=id, location=location, form=form)
 
 @main.route("/device/graph_data/month/<int:id>", methods=['GET', 'POST'])
 @login_required
