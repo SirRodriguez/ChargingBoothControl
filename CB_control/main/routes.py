@@ -13,6 +13,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import requests
+import secrets
 
 main = Blueprint('main', __name__)
 
@@ -130,14 +131,12 @@ def upload(id):
 	payload_json = payload.json()
 	location = payload_json["location"]
 	image_count = payload_json["image_count"]
-	# print(image_count)
 
 	form = SlideShowPicsForm()
 	if form.validate_on_submit():
 		image_files = []
 		for file in form.picture.data:
 			image_files.append(('image', ( file.filename, file.read() )  ))
-			print(file.filename)
 
 		# Do the post here
 		response = requests.post(service_ip + '/site/images/upload/' + str(id), files=image_files)
@@ -145,7 +144,16 @@ def upload(id):
 		flash('Pictures has been uploaded', 'success')
 		return redirect(url_for('main.upload', id=id))
 
-	return render_template("upload.html", title="Picture Upload", location=location, form=form, service_ip=service_ip, id=id, image_count=image_count)
+	random_hex = secrets.token_hex(8)
+
+	return render_template("upload.html", 
+							title="Picture Upload", 
+							location=location, 
+							form=form, 
+							service_ip=service_ip, 
+							id=id, 
+							image_count=image_count,
+							random_hex=random_hex)
 
 
 # Slide Show Pictures: Remove
@@ -178,14 +186,22 @@ def remove(id):
 			return redirect(url_for('main.error'))
 
 		if response.status_code == 204:
-			flash('Images have been successfuly removed! Refresh your browser if there is no change.', 'success')
+			flash('Images have been successfuly removed!', 'success')
 		elif response.status_code == 400:
 			flash('Image was not found in the server!', 'danger')
 		else:
 			flash("Oops! Something happened and the images were not deleted.", "danger")
 		
+	random_hex = secrets.token_hex(8)
 
-	return render_template("remove.html", title="Picture Removal", location=location, form=form, service_ip=service_ip, id=id, image_count=image_count)
+	return render_template("remove.html", 
+							title="Picture Removal", 
+							location=location, 
+							form=form, 
+							service_ip=service_ip, 
+							id=id, 
+							image_count=image_count,
+							random_hex=random_hex)
 
 # Settings for the device
 @main.route("/device/settings/<int:id>", methods=['GET', 'POST'])
