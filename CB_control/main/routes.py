@@ -160,17 +160,18 @@ def upload(id):
 @main.route("/slide_show_pics/remove/<int:id>", methods=['GET', 'POST'])
 @login_required
 def remove(id):
-	# Grab device location and image count
-	try:
-		# payload = requests.get(service_ip + '/site/location/' + str(id))
-		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+	# # Grab device location and image count
+	# try:
+	# 	# payload = requests.get(service_ip + '/site/location/' + str(id))
+	# 	payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
+	# except:
+	# 	flash("Unable to Connect to Server!", "danger")
+	# 	return redirect(url_for('main.error'))
 
-	payload_json = payload.json()
-	location = payload_json["location"]
-	image_count = payload_json["image_count"]
+	# payload_json = payload.json()
+	# location = payload_json["location"]
+	# image_count = payload_json["image_count"]
+
 
 	form = RemovePictureForm()
 	if form.validate_on_submit():
@@ -179,7 +180,6 @@ def remove(id):
 		# removals = removals_json(form.removals.data)
 
 		try:
-			print("in try")
 			response = requests.delete(service_ip + '/site/remove_images/' + str(id) + '/' + form.removals.data)
 		except:
 			flash("Unable to Connect to Server!", "danger")
@@ -192,6 +192,19 @@ def remove(id):
 		else:
 			flash("Oops! Something happened and the images were not deleted.", "danger")
 		
+
+	# Grab device location and image count
+	try:
+		# payload = requests.get(service_ip + '/site/location/' + str(id))
+		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('main.error'))
+
+	payload_json = payload.json()
+	location = payload_json["location"]
+	image_count = payload_json["image_count"]
+
 	random_hex = secrets.token_hex(8)
 
 	return render_template("remove.html", 
