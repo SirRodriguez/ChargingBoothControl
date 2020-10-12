@@ -30,6 +30,7 @@ def create_app(config_class=Config):
 	from CB_control.slide_show.routes import slide_show
 	from CB_control.settings.routes import settings
 	from CB_control.data.routes import data
+	from CB_control.device.routes import device
 
 	app.register_blueprint(main)
 	app.register_blueprint(error)
@@ -37,5 +38,6 @@ def create_app(config_class=Config):
 	app.register_blueprint(slide_show)
 	app.register_blueprint(settings)
 	app.register_blueprint(data)
+	app.register_blueprint(device)
 
 	return app
