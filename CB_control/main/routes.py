@@ -22,11 +22,11 @@ main = Blueprint('main', __name__)
 def defualt():
 	return redirect(url_for('main.admin_login'))
 
-# Server error redirected page
-@main.route("/error")
-def error():
-	# logout_user()
-	return render_template("error.html", title="Error")
+# # Server error redirected page
+# @main.route("/error")
+# def error():
+# 	# logout_user()
+# 	return render_template("error.html", title="Error")
 
 # Admin Login
 @main.route("/admin_login", methods=['GET', 'POST'])
@@ -74,7 +74,7 @@ def home():
 		payload = requests.get(service_ip + '/site/get_all')		
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 
 	device_id_list = payload.json()["device_id"]
@@ -93,7 +93,7 @@ def device(id):
 		payload = requests.get(service_ip + '/site/location/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	location = payload.json()["location"]
 
@@ -110,7 +110,7 @@ def slide_show_pics(id):
 		payload = requests.get(service_ip + '/site/location/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	location = payload.json()["location"]
 
@@ -126,7 +126,7 @@ def upload(id):
 		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	payload_json = payload.json()
 	location = payload_json["location"]
@@ -166,7 +166,7 @@ def remove(id):
 	# 	payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
 	# except:
 	# 	flash("Unable to Connect to Server!", "danger")
-	# 	return redirect(url_for('main.error'))
+	# 	return redirect(url_for('error.server_error'))
 
 	# payload_json = payload.json()
 	# location = payload_json["location"]
@@ -183,7 +183,7 @@ def remove(id):
 			response = requests.delete(service_ip + '/site/remove_images/' + str(id) + '/' + form.removals.data)
 		except:
 			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('main.error'))
+			return redirect(url_for('error.server_error'))
 
 		if response.status_code == 204:
 			flash('Images have been successfuly removed!', 'success')
@@ -199,7 +199,7 @@ def remove(id):
 		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	payload_json = payload.json()
 	location = payload_json["location"]
@@ -253,7 +253,7 @@ def device_settings(id):
 			response = requests.put(service_ip + '/site/settings/update/' + str(id), json=payload)
 		except:
 			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('main.error'))
+			return redirect(url_for('error.server_error'))
 
 		if response.status_code == 204 or response.status_code == 200:
 			flash('Settings have been updated!', 'success')
@@ -269,7 +269,7 @@ def device_settings(id):
 			payload = requests.get(service_ip + '/site/settings/' + str(id))
 		except:
 			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('main.error'))
+			return redirect(url_for('error.server_error'))
 
 		settings = payload.json()
 		
@@ -295,7 +295,7 @@ def data(id):
 		payload = requests.get(service_ip + '/site/location/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	location = payload.json()["location"]
 
@@ -312,7 +312,7 @@ def list_data(id):
 		payload = requests.get(service_ip + '/site/location/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	location = payload.json()["location"]
 
@@ -357,7 +357,7 @@ def graph_data(id):
 		payload = requests.get(service_ip + '/site/location/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	location = payload.json()["location"]
 
@@ -371,7 +371,7 @@ def graph_all_years(id):
 		payload = requests.get(service_ip + '/site/location/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	location = payload.json()["location"]
 
@@ -421,7 +421,7 @@ def graph_year(id):
 		payload = requests.get(service_ip + '/site/location/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	location = payload.json()["location"]
 
@@ -478,7 +478,7 @@ def graph_month(id):
 		payload = requests.get(service_ip + '/site/location/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	location = payload.json()["location"]
 
@@ -534,7 +534,7 @@ def graph_day(id):
 		payload = requests.get(service_ip + '/site/location/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	location = payload.json()["location"]
 
@@ -598,7 +598,7 @@ def remove_device(id):
 		response = requests.delete(service_ip + '/site/remove_device/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('main.error'))
+		return redirect(url_for('error.server_error'))
 
 	if response.status_code == 204:
 		flash('Device has been successfuly removed!', 'success')

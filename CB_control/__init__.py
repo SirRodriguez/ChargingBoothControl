@@ -25,7 +25,9 @@ def create_app(config_class=Config):
 
 
 	from CB_control.main.routes import main
+	from CB_control.error.routes import error
 
 	app.register_blueprint(main)
+	app.register_blueprint(error)
 
 	return app
