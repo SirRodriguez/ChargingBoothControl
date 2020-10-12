@@ -48,14 +48,14 @@ def list_data(id):
 		payload = requests.get(service_ip + '/site/sessions/' + str(id) + '/' + str(page))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('register.error'))
+		return redirect(url_for('error.server_error'))
 
 	# Later combine the two requests to speed up
 	try:
 		payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('register.error'))
+		return redirect(url_for('error.server_error'))
 
 	pl_json = payload.json()
 	sess_list = pl_json["sessions"]
@@ -103,7 +103,7 @@ def graph_all_years(id):
 		payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('register.error'))
+		return redirect(url_for('error.server_error'))
 
 	# Get the sessions
 	sess_list = payload.json()["sessions"]
@@ -113,7 +113,7 @@ def graph_all_years(id):
 		payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('register.error'))
+		return redirect(url_for('error.server_error'))
 
 	# Get the settings
 	settings = payload_sett.json()
@@ -151,19 +151,18 @@ def graph_year(id):
 	form = YearForm()
 	if form.validate_on_submit():
 		# Grab the sessions
-		# sessions = Session.query.all()
 		try:
 			payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
 		except:
 			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('register.error'))
+			return redirect(url_for('error.server_error'))
 
 		# Later combine the two requests to speed up
 		try:
 			payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
 		except:
 			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('register.error'))
+			return redirect(url_for('error.server_error'))
 
 		
 		# Get the sessions
@@ -208,19 +207,18 @@ def graph_month(id):
 	form = MonthForm()
 	if form.validate_on_submit():
 		# Grab the sessions
-		# sessions = Session.query.all()
 		try:
 			payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
 		except:
 			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('register.error'))
+			return redirect(url_for('error.server_error'))
 
 		# Later combine the two requests to speed up
 		try:
 			payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
 		except:
 			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('register.error'))
+			return redirect(url_for('error.server_error'))
 
 		
 		# Get the sessions
@@ -264,19 +262,18 @@ def graph_day(id):
 	form = DayForm()
 	if form.validate_on_submit():
 		# Grab the sessions
-		# sessions = Session.query.all()
 		try:
 			payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
 		except:
 			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('register.error'))
+			return redirect(url_for('error.server_error'))
 
 		# Later combine the two requests to speed up
 		try:
 			payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
 		except:
 			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('register.error'))
+			return redirect(url_for('error.server_error'))
 
 		
 		# Get the sessions
