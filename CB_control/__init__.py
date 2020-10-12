@@ -8,7 +8,7 @@ from CB_control.config import Config
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 login_manager = LoginManager()
-login_manager.login_view = 'main.admin_login'
+login_manager.login_view = 'admin_user.admin_login'
 login_manager.login_message_category = 'info'
 mail = Mail()
 service_ip = "http://localhost:7000"
@@ -26,8 +26,10 @@ def create_app(config_class=Config):
 
 	from CB_control.main.routes import main
 	from CB_control.error.routes import error
+	from CB_control.admin_user.routes import admin_user
 
 	app.register_blueprint(main)
 	app.register_blueprint(error)
+	app.register_blueprint(admin_user)
 
 	return app

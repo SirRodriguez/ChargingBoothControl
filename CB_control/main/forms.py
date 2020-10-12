@@ -10,50 +10,50 @@ from CB_control.models import AdminUser
 
 aspect_ratio_list = ['1:1', '5:4', '3:2', '16:10', '16:9', '1.85:1', '2.35:1']
 
-# Admin Log In Form
-class LoginForm(FlaskForm):
-	username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
-	password = PasswordField('Password', validators=[DataRequired()])
-	submit = SubmitField('Login')
+# # Admin Log In Form
+# class LoginForm(FlaskForm):
+# 	username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+# 	password = PasswordField('Password', validators=[DataRequired()])
+# 	submit = SubmitField('Login')
 
-# Admin Registration Form
-# This must be delete before it is used for actual production
-# This is just temporary to allow the database to properly input an admin user
-class RegistrationForm(FlaskForm):
-	username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
-	email = StringField('Email', validators=[DataRequired(), Email()])
-	password = PasswordField('Password', validators=[DataRequired()])
-	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-	submit = SubmitField('Sign Up')
+# # Admin Registration Form
+# # This must be delete before it is used for actual production
+# # This is just temporary to allow the database to properly input an admin user
+# class RegistrationForm(FlaskForm):
+# 	username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+# 	email = StringField('Email', validators=[DataRequired(), Email()])
+# 	password = PasswordField('Password', validators=[DataRequired()])
+# 	confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
+# 	submit = SubmitField('Sign Up')
 
-	def validate_username(self, username):
-		user = AdminUser.query.filter_by(username=username.data).first()
-		if user:
-			raise ValidationError('That username is taken. Please choose a different one.')
+# 	def validate_username(self, username):
+# 		user = AdminUser.query.filter_by(username=username.data).first()
+# 		if user:
+# 			raise ValidationError('That username is taken. Please choose a different one.')
 
-	def validate_email(self, email):
-		user = AdminUser.query.filter_by(email=email.data).first()
-		if user:
-			raise ValidationError('That email is taken. Please choose a different one.')
+# 	def validate_email(self, email):
+# 		user = AdminUser.query.filter_by(email=email.data).first()
+# 		if user:
+# 			raise ValidationError('That email is taken. Please choose a different one.')
 
 
-# Account
-class UpdateAccountForm(FlaskForm):
-	username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
-	email = StringField('Email', validators=[DataRequired(), Email()])
-	submit = SubmitField('Update')
+# # Account
+# class UpdateAccountForm(FlaskForm):
+# 	username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+# 	email = StringField('Email', validators=[DataRequired(), Email()])
+# 	submit = SubmitField('Update')
 
-	def validate_username(self, username):
-		if username.data != current_user.username:
-			user = AdminUser.query.filter_by(username=username.data).first()
-			if user:
-				raise ValidationError('That username is taken. Please choose a different one.')
+# 	def validate_username(self, username):
+# 		if username.data != current_user.username:
+# 			user = AdminUser.query.filter_by(username=username.data).first()
+# 			if user:
+# 				raise ValidationError('That username is taken. Please choose a different one.')
 
-	def validate_email(self, email):
-		if email.data != current_user.email:
-			user = AdminUser.query.filter_by(email=email.data).first()
-			if user:
-				raise ValidationError('That email is taken. Please choose a different one.')
+# 	def validate_email(self, email):
+# 		if email.data != current_user.email:
+# 			user = AdminUser.query.filter_by(email=email.data).first()
+# 			if user:
+# 				raise ValidationError('That email is taken. Please choose a different one.')
 
 # Settings for device
 class SettingsForm(FlaskForm):
