@@ -4,9 +4,14 @@ from CB_control import bcrypt, db, service_ip
 from CB_control.models import AdminUser
 # from CB_control.main.forms import (LoginForm, RegistrationForm, UpdateAccountForm, SettingsForm,
 # 									SlideShowPicsForm, RemovePictureForm, YearForm, MonthForm, DayForm)
-from CB_control.main.forms import (SettingsForm,
-									SlideShowPicsForm, RemovePictureForm, YearForm, MonthForm, DayForm)
-from CB_control.main.utils import (get_min_sec, removals_json, get_offset_dates_initiated, remove_png, 
+# from CB_control.main.forms import (SettingsForm,
+# 									SlideShowPicsForm, RemovePictureForm, YearForm, MonthForm, DayForm)
+from CB_control.main.forms import (SettingsForm, YearForm, MonthForm, DayForm)
+# from CB_control.main.utils import (get_min_sec, removals_json, get_offset_dates_initiated, remove_png, 
+# 									count_years, create_bar_years, save_figure, count_months,
+# 									create_bar_months, count_days, create_bar_days, count_hours,
+									# create_bar_hours)
+from CB_control.main.utils import (get_min_sec, get_offset_dates_initiated, remove_png, 
 									count_years, create_bar_years, save_figure, count_months,
 									create_bar_months, count_days, create_bar_days, count_hours,
 									create_bar_hours)
@@ -103,120 +108,120 @@ def device(id):
 	return render_template("device.html", title="Device", id=id, location=location)
 
 
-# Slide Show Pictures
-@main.route("/slide_show_pics/<int:id>")
-@login_required
-def slide_show_pics(id):
-	# Grab device location
-	try:
-		payload = requests.get(service_ip + '/site/location/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
+# # Slide Show Pictures
+# @main.route("/slide_show_pics/<int:id>")
+# @login_required
+# def slide_show_pics(id):
+# 	# Grab device location
+# 	try:
+# 		payload = requests.get(service_ip + '/site/location/' + str(id))
+# 	except:
+# 		flash("Unable to Connect to Server!", "danger")
+# 		return redirect(url_for('error.server_error'))
 
-	location = payload.json()["location"]
+# 	location = payload.json()["location"]
 
-	return render_template("slide_show_pics.html", title="Slide Show Pictures", location=location, id=id)
+# 	return render_template("slide_show/slide_show_pics.html", title="Slide Show Pictures", location=location, id=id)
 
-# Slide Show Pictures: Upload
-@main.route("/slide_show_pics/upload/<int:id>", methods=['GET', 'POST'])
-@login_required
-def upload(id):
-	# Grab device location and image number
-	try:
-		# payload = requests.get(service_ip + '/site/location/' + str(id))
-		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
+# # Slide Show Pictures: Upload
+# @main.route("/slide_show_pics/upload/<int:id>", methods=['GET', 'POST'])
+# @login_required
+# def upload(id):
+# 	# Grab device location and image number
+# 	try:
+# 		# payload = requests.get(service_ip + '/site/location/' + str(id))
+# 		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
+# 	except:
+# 		flash("Unable to Connect to Server!", "danger")
+# 		return redirect(url_for('error.server_error'))
 
-	payload_json = payload.json()
-	location = payload_json["location"]
-	image_count = payload_json["image_count"]
+# 	payload_json = payload.json()
+# 	location = payload_json["location"]
+# 	image_count = payload_json["image_count"]
 
-	form = SlideShowPicsForm()
-	if form.validate_on_submit():
-		image_files = []
-		for file in form.picture.data:
-			image_files.append(('image', ( file.filename, file.read() )  ))
+# 	form = SlideShowPicsForm()
+# 	if form.validate_on_submit():
+# 		image_files = []
+# 		for file in form.picture.data:
+# 			image_files.append(('image', ( file.filename, file.read() )  ))
 
-		# Do the post here
-		response = requests.post(service_ip + '/site/images/upload/' + str(id), files=image_files)
+# 		# Do the post here
+# 		response = requests.post(service_ip + '/site/images/upload/' + str(id), files=image_files)
 
-		flash('Pictures has been uploaded', 'success')
-		return redirect(url_for('main.upload', id=id))
+# 		flash('Pictures has been uploaded', 'success')
+# 		return redirect(url_for('slide_show.upload', id=id))
 
-	random_hex = secrets.token_hex(8)
+# 	random_hex = secrets.token_hex(8)
 
-	return render_template("upload.html", 
-							title="Picture Upload", 
-							location=location, 
-							form=form, 
-							service_ip=service_ip, 
-							id=id, 
-							image_count=image_count,
-							random_hex=random_hex)
-
-
-# Slide Show Pictures: Remove
-@main.route("/slide_show_pics/remove/<int:id>", methods=['GET', 'POST'])
-@login_required
-def remove(id):
-	# # Grab device location and image count
-	# try:
-	# 	# payload = requests.get(service_ip + '/site/location/' + str(id))
-	# 	payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
-	# except:
-	# 	flash("Unable to Connect to Server!", "danger")
-	# 	return redirect(url_for('error.server_error'))
-
-	# payload_json = payload.json()
-	# location = payload_json["location"]
-	# image_count = payload_json["image_count"]
+# 	return render_template("slide_show/upload.html", 
+# 							title="Picture Upload", 
+# 							location=location, 
+# 							form=form, 
+# 							service_ip=service_ip, 
+# 							id=id, 
+# 							image_count=image_count,
+# 							random_hex=random_hex)
 
 
-	form = RemovePictureForm()
-	if form.validate_on_submit():
-		# Post a delete image files here
+# # Slide Show Pictures: Remove
+# @main.route("/slide_show_pics/remove/<int:id>", methods=['GET', 'POST'])
+# @login_required
+# def remove(id):
+# 	# # Grab device location and image count
+# 	# try:
+# 	# 	# payload = requests.get(service_ip + '/site/location/' + str(id))
+# 	# 	payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
+# 	# except:
+# 	# 	flash("Unable to Connect to Server!", "danger")
+# 	# 	return redirect(url_for('error.server_error'))
 
-		# removals = removals_json(form.removals.data)
+# 	# payload_json = payload.json()
+# 	# location = payload_json["location"]
+# 	# image_count = payload_json["image_count"]
 
-		try:
-			response = requests.delete(service_ip + '/site/remove_images/' + str(id) + '/' + form.removals.data)
-		except:
-			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('error.server_error'))
 
-		if response.status_code == 204:
-			flash('Images have been successfuly removed!', 'success')
-		elif response.status_code == 400:
-			flash('Image was not found in the server!', 'danger')
-		else:
-			flash("Oops! Something happened and the images were not deleted.", "danger")
+# 	form = RemovePictureForm()
+# 	if form.validate_on_submit():
+# 		# Post a delete image files here
+
+# 		# removals = removals_json(form.removals.data)
+
+# 		try:
+# 			response = requests.delete(service_ip + '/site/remove_images/' + str(id) + '/' + form.removals.data)
+# 		except:
+# 			flash("Unable to Connect to Server!", "danger")
+# 			return redirect(url_for('error.server_error'))
+
+# 		if response.status_code == 204:
+# 			flash('Images have been successfuly removed!', 'success')
+# 		elif response.status_code == 400:
+# 			flash('Image was not found in the server!', 'danger')
+# 		else:
+# 			flash("Oops! Something happened and the images were not deleted.", "danger")
 		
 
-	# Grab device location and image count
-	try:
-		# payload = requests.get(service_ip + '/site/location/' + str(id))
-		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
+# 	# Grab device location and image count
+# 	try:
+# 		# payload = requests.get(service_ip + '/site/location/' + str(id))
+# 		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
+# 	except:
+# 		flash("Unable to Connect to Server!", "danger")
+# 		return redirect(url_for('error.server_error'))
 
-	payload_json = payload.json()
-	location = payload_json["location"]
-	image_count = payload_json["image_count"]
+# 	payload_json = payload.json()
+# 	location = payload_json["location"]
+# 	image_count = payload_json["image_count"]
 
-	random_hex = secrets.token_hex(8)
+# 	random_hex = secrets.token_hex(8)
 
-	return render_template("remove.html", 
-							title="Picture Removal", 
-							location=location, 
-							form=form, 
-							service_ip=service_ip, 
-							id=id, 
-							image_count=image_count,
-							random_hex=random_hex)
+# 	return render_template("slide_show/remove.html", 
+# 							title="Picture Removal", 
+# 							location=location, 
+# 							form=form, 
+# 							service_ip=service_ip, 
+# 							id=id, 
+# 							image_count=image_count,
+# 							random_hex=random_hex)
 
 # Settings for the device
 @main.route("/device/settings/<int:id>", methods=['GET', 'POST'])

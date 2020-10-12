@@ -13,26 +13,26 @@ def get_min_sec(seconds):
 	sec = seconds - (minutes * 60)
 	return minutes, sec
 
-def removals_json(removals):
-	print(type(removals))
-	print(removals)
+# def removals_json(removals):
+# 	print(type(removals))
+# 	print(removals)
 
-	rem_list = removals.split(",")
-	print(type(rem_list))
-	print(rem_list)
+# 	rem_list = removals.split(",")
+# 	print(type(rem_list))
+# 	print(rem_list)
 
-	# fix index
-	for index, value in enumerate(rem_list):
-		rem_list[index] = int(rem_list[index])-1
+# 	# fix index
+# 	for index, value in enumerate(rem_list):
+# 		rem_list[index] = int(rem_list[index])-1
 
-	print(rem_list)
+# 	print(rem_list)
 
-	payload = {}
-	payload["removlas"] = rem_list
+# 	payload = {}
+# 	payload["removlas"] = rem_list
 
-	resp = jsonify(payload)
-	# resp.status_code = 200
-	return resp
+# 	resp = jsonify(payload)
+# 	# resp.status_code = 200
+# 	return resp
 
 def get_offset_dates_initiated(sessions, time_offset):
 	fmt = '%b %d, %Y - %I:%M:%S %p'
