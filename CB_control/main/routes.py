@@ -6,12 +6,17 @@ from CB_control.models import AdminUser
 # 									SlideShowPicsForm, RemovePictureForm, YearForm, MonthForm, DayForm)
 # from CB_control.main.forms import (SettingsForm,
 # 									SlideShowPicsForm, RemovePictureForm, YearForm, MonthForm, DayForm)
-from CB_control.main.forms import (SettingsForm, YearForm, MonthForm, DayForm)
+# from CB_control.main.forms import (SettingsForm, YearForm, MonthForm, DayForm)
+from CB_control.main.forms import (YearForm, MonthForm, DayForm)
 # from CB_control.main.utils import (get_min_sec, removals_json, get_offset_dates_initiated, remove_png, 
 # 									count_years, create_bar_years, save_figure, count_months,
 # 									create_bar_months, count_days, create_bar_days, count_hours,
 									# create_bar_hours)
-from CB_control.main.utils import (get_min_sec, get_offset_dates_initiated, remove_png, 
+# from CB_control.main.utils import (get_min_sec, get_offset_dates_initiated, remove_png, 
+# 									count_years, create_bar_years, save_figure, count_months,
+# 									create_bar_months, count_days, create_bar_days, count_hours,
+# 									create_bar_hours)
+from CB_control.main.utils import (get_offset_dates_initiated, remove_png, 
 									count_years, create_bar_years, save_figure, count_months,
 									create_bar_months, count_days, create_bar_days, count_hours,
 									create_bar_hours)
@@ -223,74 +228,74 @@ def device(id):
 # 							image_count=image_count,
 # 							random_hex=random_hex)
 
-# Settings for the device
-@main.route("/device/settings/<int:id>", methods=['GET', 'POST'])
-@login_required
-def device_settings(id):
+# # Settings for the device
+# @main.route("/device/settings/<int:id>", methods=['GET', 'POST'])
+# @login_required
+# def device_settings(id):
 
-	form = SettingsForm()
-	if form.validate_on_submit():
-		payload = {}
+# 	form = SettingsForm()
+# 	if form.validate_on_submit():
+# 		payload = {}
 
-		payload["toggle_pay"] = form.toggle_pay.data
-		payload["price"] = form.price.data
-		# Settings.query.first().charge_time = form.charge_time.data
-		minutes = form.charge_time_min.data
-		seconds = form.charge_time_sec.data
-		payload["charge_time"] = minutes*60 + seconds;
-		payload["time_offset"] = form.time_zone.data
-		payload["location"] = form.location.data
+# 		payload["toggle_pay"] = form.toggle_pay.data
+# 		payload["price"] = form.price.data
+# 		# Settings.query.first().charge_time = form.charge_time.data
+# 		minutes = form.charge_time_min.data
+# 		seconds = form.charge_time_sec.data
+# 		payload["charge_time"] = minutes*60 + seconds;
+# 		payload["time_offset"] = form.time_zone.data
+# 		payload["location"] = form.location.data
 
-		# Check if aspect ration is different so that it can resize all images
-		# resize = False
-		# if Settings.query.first().aspect_ratio_width != float(form.aspect_ratio.data.split(":")[0]) and \
-		# 	Settings.query.first().aspect_ratio_height != float(form.aspect_ratio.data.split(":")[1]):
-		# 	resize = True
+# 		# Check if aspect ration is different so that it can resize all images
+# 		# resize = False
+# 		# if Settings.query.first().aspect_ratio_width != float(form.aspect_ratio.data.split(":")[0]) and \
+# 		# 	Settings.query.first().aspect_ratio_height != float(form.aspect_ratio.data.split(":")[1]):
+# 		# 	resize = True
 
-		payload["aspect_ratio_width"] = float(form.aspect_ratio.data.split(":")[0])
-		payload["aspect_ratio_height"] = float(form.aspect_ratio.data.split(":")[1])
+# 		payload["aspect_ratio_width"] = float(form.aspect_ratio.data.split(":")[0])
+# 		payload["aspect_ratio_height"] = float(form.aspect_ratio.data.split(":")[1])
 
-		# if resize:
-		# 	pic_files = PFI()
-		# 	pic_files.resize_all(Settings.query.first().aspect_ratio_width, Settings.query.first().aspect_ratio_height)
+# 		# if resize:
+# 		# 	pic_files = PFI()
+# 		# 	pic_files.resize_all(Settings.query.first().aspect_ratio_width, Settings.query.first().aspect_ratio_height)
 
-		# db.session.commit()
+# 		# db.session.commit()
 		
-		try:
-			response = requests.put(service_ip + '/site/settings/update/' + str(id), json=payload)
-		except:
-			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('error.server_error'))
+# 		try:
+# 			response = requests.put(service_ip + '/site/settings/update/' + str(id), json=payload)
+# 		except:
+# 			flash("Unable to Connect to Server!", "danger")
+# 			return redirect(url_for('error.server_error'))
 
-		if response.status_code == 204 or response.status_code == 200:
-			flash('Settings have been updated!', 'success')
-		elif response.status_code == 400:
-			flash('Server could not find device!', 'danger')
-		else:
-			flash('Something happened and settings were not updated.', 'danger')
+# 		if response.status_code == 204 or response.status_code == 200:
+# 			flash('Settings have been updated!', 'success')
+# 		elif response.status_code == 400:
+# 			flash('Server could not find device!', 'danger')
+# 		else:
+# 			flash('Something happened and settings were not updated.', 'danger')
 
-		return redirect(url_for('main.device_settings', id=id))
-	elif request.method == 'GET':
-		# Grab device settings
-		try:
-			payload = requests.get(service_ip + '/site/settings/' + str(id))
-		except:
-			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('error.server_error'))
+# 		return redirect(url_for('settings.device_settings', id=id))
+# 	elif request.method == 'GET':
+# 		# Grab device settings
+# 		try:
+# 			payload = requests.get(service_ip + '/site/settings/' + str(id))
+# 		except:
+# 			flash("Unable to Connect to Server!", "danger")
+# 			return redirect(url_for('error.server_error'))
 
-		settings = payload.json()
+# 		settings = payload.json()
 		
-		form.toggle_pay.data = settings["toggle_pay"]
-		form.price.data = settings["price"]
-		minutes, seconds = get_min_sec(seconds=settings["charge_time"])
-		form.charge_time_min.data = minutes
-		form.charge_time_sec.data = seconds
-		form.time_zone.data = settings["time_offset"]
-		form.location.data = settings["location"]
-		form.aspect_ratio.data = str( int(settings["aspect_ratio_width"]) if (settings["aspect_ratio_width"]).is_integer() else settings["aspect_ratio_width"] ) \
-									+ ":" + str( int(settings["aspect_ratio_height"]) if (settings["aspect_ratio_height"]).is_integer() else settings["aspect_ratio_height"] ) 
+# 		form.toggle_pay.data = settings["toggle_pay"]
+# 		form.price.data = settings["price"]
+# 		minutes, seconds = get_min_sec(seconds=settings["charge_time"])
+# 		form.charge_time_min.data = minutes
+# 		form.charge_time_sec.data = seconds
+# 		form.time_zone.data = settings["time_offset"]
+# 		form.location.data = settings["location"]
+# 		form.aspect_ratio.data = str( int(settings["aspect_ratio_width"]) if (settings["aspect_ratio_width"]).is_integer() else settings["aspect_ratio_width"] ) \
+# 									+ ":" + str( int(settings["aspect_ratio_height"]) if (settings["aspect_ratio_height"]).is_integer() else settings["aspect_ratio_height"] ) 
 
-	return render_template("settings.html", title="Settings", form=form)
+# 	return render_template("settings/settings.html", title="Settings", form=form)
 
 
 # Device data

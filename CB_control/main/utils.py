@@ -8,10 +8,10 @@ from os.path import isfile, join
 import matplotlib.pyplot as plt
 import secrets
 
-def get_min_sec(seconds):
-	minutes = seconds // 60
-	sec = seconds - (minutes * 60)
-	return minutes, sec
+# def get_min_sec(seconds):
+# 	minutes = seconds // 60
+# 	sec = seconds - (minutes * 60)
+# 	return minutes, sec
 
 # def removals_json(removals):
 # 	print(type(removals))

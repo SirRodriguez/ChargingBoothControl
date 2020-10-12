@@ -28,10 +28,12 @@ def create_app(config_class=Config):
 	from CB_control.error.routes import error
 	from CB_control.admin_user.routes import admin_user
 	from CB_control.slide_show.routes import slide_show
+	from CB_control.settings.routes import settings
 
 	app.register_blueprint(main)
 	app.register_blueprint(error)
 	app.register_blueprint(admin_user)
 	app.register_blueprint(slide_show)
+	app.register_blueprint(settings)
 
 	return app
