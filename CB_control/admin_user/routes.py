@@ -21,7 +21,7 @@ def admin_login():
 		user = AdminUser.query.first()
 		if payload.json()["user_verified"]:
 			login_user(user)
-			next_page = request.args.get('nest')
+			next_page = request.args.get('next')
 			return redirect(url_for('main.home'))
 		else:
 			flash('Loging Unsuccessful. Please check username and password', 'danger')
@@ -90,4 +90,4 @@ def account():
 		form.username.data = payload.json()["username"]
 		form.email.data = payload.json()["email"]
 
-	return render_template("admin_user/account.html", title="Account Information", form=form)
+	return render_template("admin_user/account.html", title="Account Information", form=form, payload=payload)
