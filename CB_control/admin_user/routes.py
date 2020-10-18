@@ -1,8 +1,9 @@
 from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_user, current_user, logout_user, login_required
-from CB_control import db, bcrypt
+from CB_control import db, bcrypt, service_ip
 from CB_control.models import AdminUser
 from CB_control.admin_user.forms import LoginForm, RegistrationForm, UpdateAccountForm
+import requests
 
 admin_user = Blueprint('admin_user', __name__)
 
@@ -11,10 +12,16 @@ admin_user = Blueprint('admin_user', __name__)
 def admin_login():
 	form = LoginForm()
 	if form.validate_on_submit():
-		user = AdminUser.query.filter_by(username=form.username.data).first()
-		if user and bcrypt.check_password_hash(user.password, form.password.data):
+		try:
+			payload = requests.get(service_ip + '/site/admin_user/verify_user/' + form.username.data + '/' + form.password.data)
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('error.server_error'))
+
+		user = AdminUser.query.first()
+		if payload.json()["user_verified"]:
 			login_user(user)
-			next_page = request.args.get('next')
+			next_page = request.args.get('nest')
 			return redirect(url_for('main.home'))
 		else:
 			flash('Loging Unsuccessful. Please check username and password', 'danger')
@@ -47,15 +54,40 @@ def logout():
 @admin_user.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
+
+	# Get account info from service
+	try:
+		payload = requests.get(service_ip + '/site/admin_user/account_info')
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('error.server_error'))
+
+
 	form = UpdateAccountForm()
 	if form.validate_on_submit():
-		current_user.username = form.username.data
-		current_user.email = form.email.data
-		db.session.commit()
-		flash('Your account has been updated!', 'success')
+		payload = {}
+
+		# pack the updated account info
+		payload["username"] = form.username.data
+		payload["email"] = form.email.data
+
+		# Send the updated account
+		try:
+			response = requests.put(service_ip + '/site/admin_user/update_account/', json=payload)
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('error.server_error'))
+
+		# Check response
+		if response.status_code == 204 or response.status_code == 200:
+			flash('Account has been updated!', 'success')
+		else:
+			flash('Something happened and settings were not updated.', 'danger')
+
 		return redirect(url_for('admin_user.account'))
+
 	elif request.method == 'GET':
-		form.username.data = current_user.username
-		form.email.data = current_user.email
+		form.username.data = payload.json()["username"]
+		form.email.data = payload.json()["email"]
 
 	return render_template("admin_user/account.html", title="Account Information", form=form)
