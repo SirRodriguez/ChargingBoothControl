@@ -2,7 +2,8 @@ from flask import Blueprint, redirect, render_template, request, url_for, flash
 from flask_login import login_user, current_user, logout_user, login_required
 from CB_control import db, bcrypt, service_ip
 from CB_control.models import AdminUser
-from CB_control.admin_user.forms import LoginForm, RegistrationForm, UpdateAccountForm
+from CB_control.admin_user.forms import LoginForm, RegistrationForm, UpdateAccountForm, ResetPasswordForm
+from CB_control.admin_user.utils import send_reset_email
 import requests
 
 admin_user = Blueprint('admin_user', __name__)
@@ -91,3 +92,86 @@ def account():
 		form.email.data = payload.json()["email"]
 
 	return render_template("admin_user/account.html", title="Account Information", form=form, payload=payload)
+
+# Forgot password when logged out
+@admin_user.route("/reset_password")
+def reset_request():
+	if current_user.is_authenticated:
+		return redirect(url_for('main.home'))
+
+	# Get account info from service
+	try:
+		payload = requests.get(service_ip + '/site/admin_user/account_info')
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('error.server_error'))
+
+	user = AdminUser.query.first()
+	send_reset_email(email=payload.json()["email"], user=user, logged_in=False)	
+
+	flash('An email has been sent with instructions to reset your password.', 'info')
+
+	return redirect(url_for('admin_user.admin_login'))
+
+@admin_user.route("/reset_token/<token>", methods=['GET', 'POST'])
+def reset_token(token):
+	if current_user.is_authenticated:
+		return redirect(url_for('main.home'))
+
+	user = AdminUser.verify_reset_token(token)
+	if user is None:
+		flash('That is an invalid or expired token', 'warning')
+		return redirect(url_for('admin_user.login'))
+
+	form = ResetPasswordForm()
+	if form.validate_on_submit():
+		payload = {}
+		payload["hashed_password"] = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+
+		try:
+			response = requests.put(service_ip + '/site/admin_user/update_password/', json=payload)
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('error.server_error'))
+
+		flash('Your password has been updated! You are now able to log in.', 'success')
+		return redirect(url_for('admin_user.admin_login'))
+	return render_template('admin_user/reset_token.html', title='Reset Password', form=form)
+
+#Change password when logged in
+@admin_user.route("/change_password")
+def change_request():
+	# Get account info from service
+	try:
+		payload = requests.get(service_ip + '/site/admin_user/account_info')
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('error.server_error'))
+
+	user = AdminUser.query.first()
+	send_reset_email(email=payload.json()["email"], user=user, logged_in=True)	
+
+	flash('An email has been sent with instructions to reset your password.', 'info')
+	return redirect(url_for('admin_user.account'))
+
+@admin_user.route("/change_token/<token>", methods=['GET', 'POST'])
+def change_token(token):
+	user = AdminUser.verify_reset_token(token)
+	if user is None:
+		flash('That is an invalid or expired token', 'warning')
+		return redirect(url_for('admin_user.admin_login'))
+
+	form = ResetPasswordForm()
+	if form.validate_on_submit():
+		payload = {}
+		payload["hashed_password"] = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+
+		try:
+			response = requests.put(service_ip + '/site/admin_user/update_password/', json=payload)
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('error.server_error'))
+
+		flash('Your password has been updated!', 'success')
+		return redirect(url_for('admin_user.admin_login'))
+	return render_template('admin_user/reset_token.html', title='Reset Password', form=form)
