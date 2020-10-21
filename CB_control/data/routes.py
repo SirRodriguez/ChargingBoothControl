@@ -10,35 +10,15 @@ import requests
 data = Blueprint('data', __name__)
 
 # Device data
-@data.route("/device/data/<int:id>")
+@data.route("/device/data/<int:id>/<string:location>")
 @login_required
-def main(id):
-	# Grab device location
-	try:
-		payload = requests.get(service_ip + '/site/location/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
-
-	location = payload.json()["location"]
-
+def main(id, location):
 	return render_template("data/data.html", title="Data", location=location, id=id)
 
-
-
 # List Data
-@data.route("/device/list_data/<int:id>")
+@data.route("/device/list_data/<int:id>/<string:location>")
 @login_required
-def list_data(id):
-	# Grab device location
-	try:
-		payload = requests.get(service_ip + '/site/location/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
-
-	location = payload.json()["location"]
-
+def list_data(id, location):
 	# Grab the device data listed 
 
 	# Pagination page
@@ -50,19 +30,10 @@ def list_data(id):
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('error.server_error'))
 
-	# Later combine the two requests to speed up
-	try:
-		payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
-
 	pl_json = payload.json()
 	sess_list = pl_json["sessions"]
 	iter_pages = pl_json["iter_pages"]
-
-	# Get the settings
-	settings = payload_sett.json()
+	settings = pl_json["settings"]
 
 	date_strings = get_offset_dates_initiated(sessions=sess_list,
 									time_offset=settings["time_offset"])
@@ -71,33 +42,14 @@ def list_data(id):
 	return render_template("data/list_data.html", title="List Data", iter_pages=iter_pages, 
 							page=page, sessions_and_dates=sessions_and_dates, id=id)
 
-
-@data.route("/device/graph_data/<int:id>")
+@data.route("/device/graph_data/<int:id>/<string:location>")
 @login_required
-def graph_data(id):
-	# Grab device location
-	try:
-		payload = requests.get(service_ip + '/site/location/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
-
-	location = payload.json()["location"]
-
+def graph_data(id, location):
 	return render_template("data/graph_data.html", title="Graph Data", location=location, id=id)
 
-@data.route("/device/graph_data/all_years/<int:id>")
+@data.route("/device/graph_data/all_years/<int:id>/<string:location>")
 @login_required
-def graph_all_years(id):
-	# Grab device location
-	try:
-		payload = requests.get(service_ip + '/site/location/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
-
-	location = payload.json()["location"]
-
+def graph_all_years(id, location):
 	# Grab the sessions
 	try:
 		payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
@@ -105,18 +57,10 @@ def graph_all_years(id):
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('error.server_error'))
 
-	# Get the sessions
-	sess_list = payload.json()["sessions"]
-
-	# Later combine the two requests to speed up
-	try:
-		payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
-
-	# Get the settings
-	settings = payload_sett.json()
+	# Get the sessions and settings
+	pl_json = payload.json()
+	sess_list = pl_json["sessions"]
+	settings = pl_json["settings"]
 
 	# Delete old pic files
 	remove_png()
@@ -136,18 +80,9 @@ def graph_all_years(id):
 
 	return render_template("data/graph_all_years.html", title="All Years", id=id, location=location, pic_name=pic_name)
 
-@data.route("/device/graph_data/year/<int:id>", methods=['GET', 'POST'])
+@data.route("/device/graph_data/year/<int:id>/<string:location>", methods=['GET', 'POST'])
 @login_required
-def graph_year(id):
-	# Grab device location
-	try:
-		payload = requests.get(service_ip + '/site/location/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
-
-	location = payload.json()["location"]
-
+def graph_year(id, location):
 	form = YearForm()
 	if form.validate_on_submit():
 		# Grab the sessions
@@ -157,20 +92,9 @@ def graph_year(id):
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
 
-		# Later combine the two requests to speed up
-		try:
-			payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
-		except:
-			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('error.server_error'))
-
-		
-		# Get the sessions
-		sess_list = payload.json()["sessions"]
-
-		# Get the settings
-		settings = payload_sett.json()
-
+		pl_json = payload.json()
+		sess_list = pl_json["sessions"]
+		settings = pl_json["settings"]
 
 		# Delete old pic files
 		remove_png()
@@ -192,18 +116,9 @@ def graph_year(id):
 
 	return render_template("data/graph_year.html", title="All Years", id=id, location=location, form=form)
 
-@data.route("/device/graph_data/month/<int:id>", methods=['GET', 'POST'])
+@data.route("/device/graph_data/month/<int:id>/<string:location>", methods=['GET', 'POST'])
 @login_required
-def graph_month(id):
-	# Grab device location
-	try:
-		payload = requests.get(service_ip + '/site/location/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
-
-	location = payload.json()["location"]
-
+def graph_month(id, location):
 	form = MonthForm()
 	if form.validate_on_submit():
 		# Grab the sessions
@@ -213,19 +128,9 @@ def graph_month(id):
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
 
-		# Later combine the two requests to speed up
-		try:
-			payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
-		except:
-			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('error.server_error'))
-
-		
-		# Get the sessions
-		sess_list = payload.json()["sessions"]
-
-		# Get the settings
-		settings = payload_sett.json()
+		pl_json = payload.json()
+		sess_list = pl_json["sessions"]
+		settings = pl_json["settings"]
 
 		# Delete old pic files
 		remove_png()
@@ -247,18 +152,9 @@ def graph_month(id):
 
 	return render_template("data/graph_month.html", title="All Years", id=id, location=location, form=form)
 
-@data.route("/device/graph_data/day/<int:id>", methods=['GET', 'POST'])
+@data.route("/device/graph_data/day/<int:id>/<string:location>", methods=['GET', 'POST'])
 @login_required
-def graph_day(id):
-	# Grab device location
-	try:
-		payload = requests.get(service_ip + '/site/location/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
-
-	location = payload.json()["location"]
-
+def graph_day(id, location):
 	form = DayForm()
 	if form.validate_on_submit():
 		# Grab the sessions
@@ -267,20 +163,10 @@ def graph_day(id):
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
-
-		# Later combine the two requests to speed up
-		try:
-			payload_sett = requests.get(service_ip + '/site/settings/' + str(id))
-		except:
-			flash("Unable to Connect to Server!", "danger")
-			return redirect(url_for('error.server_error'))
-
 		
-		# Get the sessions
-		sess_list = payload.json()["sessions"]
-
-		# Get the settings
-		settings = payload_sett.json()
+		pl_json = payload.json()
+		sess_list = pl_json["sessions"]
+		settings = pl_json["settings"]
 
 		# Delete old pic files
 		remove_png()

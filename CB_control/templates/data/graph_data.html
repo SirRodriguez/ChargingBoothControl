@@ -19,23 +19,23 @@
 			<dl class="dl-horizontal" style="padding-left: 10px">
 				<!-- 1 -->
 				<hr>
-				<dt><a href="{{ url_for('data.graph_all_years', id=id) }}" style="color: black">All Years</a></dt>
+				<dt><a href="{{ url_for('data.graph_all_years', id=id, location=location) }}" style="color: black">All Years</a></dt>
 				<dd>Display all years that have sessions and will show how many sessions were made in each year.</dd>
 
 
 				<!-- 2 -->
 				<hr>
-				<dt><a href="{{ url_for('data.graph_year', id=id) }}" style="color: black">By Year</a></dt>
+				<dt><a href="{{ url_for('data.graph_year', id=id, location=location) }}" style="color: black">By Year</a></dt>
 				<dd>Display each month of a given year and show how many sessions in each month.</dd>
 
 				<!-- 3 -->
 				<hr>
-				<dt><a href="{{ url_for('data.graph_month', id=id) }}" style="color: black">By Month</a></dt>
+				<dt><a href="{{ url_for('data.graph_month', id=id, location=location) }}" style="color: black">By Month</a></dt>
 				<dd>Display each day of a given month and show how many sessions occured in each day.</dd>
 
 				<!-- 4 -->
 				<hr>
-				<dt><a href="{{ url_for('data.graph_day', id=id) }}" style="color: black">By day</a></dt>
+				<dt><a href="{{ url_for('data.graph_day', id=id, location=location) }}" style="color: black">By day</a></dt>
 				<dd>Display each hour of a given day and show how many sessions occured in each hour.</dd>
 
 				<hr>

@@ -21,7 +21,7 @@
 			<dl class="dl-horizontal" style="padding-left: 10px">
 				{% for location, id in devices %}
 					<hr>
-					<dt><a href="{{ url_for('device.main', id=id) }}" style="color: black">{{ location }}</a></dt>
+					<dt><a href="{{ url_for('device.main', id=id, location=location) }}" style="color: black">{{ location }}</a></dt>
 				{% endfor %}
 
 				<hr>

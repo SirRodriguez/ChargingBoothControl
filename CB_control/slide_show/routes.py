@@ -8,34 +8,23 @@ import secrets
 slide_show = Blueprint('slide_show', __name__)
 
 # Slide Show Pictures
-@slide_show.route("/slide_show_pics/<int:id>")
+@slide_show.route("/slide_show_pics/<int:id>/<string:location>")
 @login_required
-def slide_show_pics(id):
-	# Grab device location
-	try:
-		payload = requests.get(service_ip + '/site/location/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
-
-	location = payload.json()["location"]
-
+def slide_show_pics(id, location):
 	return render_template("slide_show/slide_show_pics.html", title="Slide Show Pictures", location=location, id=id)
 
 # Slide Show Pictures: Upload
-@slide_show.route("/slide_show_pics/upload/<int:id>", methods=['GET', 'POST'])
+@slide_show.route("/slide_show_pics/upload/<int:id>/<string:location>", methods=['GET', 'POST'])
 @login_required
-def upload(id):
-	# Grab device location and image number
+def upload(id, location):
+	# Grab device image count
 	try:
-		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
+		payload = requests.get(service_ip + '/site/image_count/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('error.server_error'))
 
-	payload_json = payload.json()
-	location = payload_json["location"]
-	image_count = payload_json["image_count"]
+	image_count = payload.json()["image_count"]
 
 	form = SlideShowPicsForm()
 	if form.validate_on_submit():
@@ -47,7 +36,7 @@ def upload(id):
 		response = requests.post(service_ip + '/site/images/upload/' + str(id), files=image_files)
 
 		flash('Pictures has been uploaded', 'success')
-		return redirect(url_for('slide_show.upload', id=id))
+		return redirect(url_for('slide_show.upload', id=id, location=location))
 
 	random_hex = secrets.token_hex(8)
 
@@ -62,13 +51,12 @@ def upload(id):
 
 
 # Slide Show Pictures: Remove
-@slide_show.route("/slide_show_pics/remove/<int:id>", methods=['GET', 'POST'])
+@slide_show.route("/slide_show_pics/remove/<int:id>/<string:location>", methods=['GET', 'POST'])
 @login_required
-def remove(id):
+def remove(id, location):
 	form = RemovePictureForm()
 	if form.validate_on_submit():
 		# Post a delete image files here
-
 		try:
 			response = requests.delete(service_ip + '/site/remove_images/' + str(id) + '/' + form.removals.data)
 		except:
@@ -85,15 +73,12 @@ def remove(id):
 
 	# Grab device location and image count
 	try:
-		# payload = requests.get(service_ip + '/site/location/' + str(id))
-		payload = requests.get(service_ip + '/site/location_image_count/' + str(id))
+		payload = requests.get(service_ip + '/site/image_count/' + str(id))
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('error.server_error'))
 
-	payload_json = payload.json()
-	location = payload_json["location"]
-	image_count = payload_json["image_count"]
+	image_count = payload.json()["image_count"]
 
 	random_hex = secrets.token_hex(8)
 

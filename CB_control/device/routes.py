@@ -6,19 +6,9 @@ import requests
 device = Blueprint('device', __name__)
 
 # Show device settings options
-@device.route("/device/<int:id>")
+@device.route("/device/<int:id>/<string:location>")
 @login_required
-def main(id):
-	# Grab device location
-	try:
-		payload = requests.get(service_ip + '/site/location/' + str(id))
-	except:
-		flash("Unable to Connect to Server!", "danger")
-		return redirect(url_for('error.server_error'))
-
-	location = payload.json()["location"]
-
-
+def main(id, location):
 	return render_template("device/device.html", title="Device", id=id, location=location)
 
 

@@ -21,7 +21,7 @@
 			<dl class="dl-horizontal" style="padding-left: 10px">
 				<!-- 1 -->
 				<hr>
-				<dt><a href="{{ url_for('slide_show.slide_show_pics', id=id) }}" style="color: black">Slide Show Pictures</a></dt>
+				<dt><a href="{{ url_for('slide_show.slide_show_pics', id=id, location=location) }}" style="color: black">Slide Show Pictures</a></dt>
 				<dd>Upload, Remove Slide Show pictures from all, region, or single device at a time.</dd>
 
 
@@ -33,7 +33,7 @@
 
 				<!-- 3 -->
 				<hr>
-				<dt><a href="{{ url_for('data.main', id=id) }}" style="color: black">Data</a></dt>
+				<dt><a href="{{ url_for('data.main', id=id, location=location) }}" style="color: black">Data</a></dt>
 				<dd>View data recorded from devices.</dd>
 
 				<!-- Remove device section -->

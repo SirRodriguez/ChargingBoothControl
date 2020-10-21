@@ -19,13 +19,13 @@
 			<dl class="dl-horizontal" style="padding-left: 10px">
 				<!-- 1 -->
 				<hr>
-				<dt><a href="{{ url_for('slide_show.upload', id=id) }}" style="color: black">Upload</a></dt>
+				<dt><a href="{{ url_for('slide_show.upload', id=id, location=location) }}" style="color: black">Upload</a></dt>
 				<dd>Upload Slide Show Pictures</dd>
 
 
 				<!-- 2 -->
 				<hr>
-				<dt><a href="{{ url_for('slide_show.remove', id=id) }}" style="color: black">Remove</a></dt>
+				<dt><a href="{{ url_for('slide_show.remove', id=id, location=location) }}" style="color: black">Remove</a></dt>
 				<dd>Remove Slide Show Pictures</dd>
 
 				<hr>
