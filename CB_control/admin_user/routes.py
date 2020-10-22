@@ -13,8 +13,12 @@ admin_user = Blueprint('admin_user', __name__)
 def admin_login():
 	form = LoginForm()
 	if form.validate_on_submit():
+		json_send = {}
+		json_send["username"] = form.username.data
+		json_send["password"] = form.password.data
+
 		try:
-			payload = requests.get(service_ip + '/site/admin_user/verify_user/' + form.username.data + '/' + form.password.data)
+			payload = requests.get(service_ip + '/site/admin_user/verify_user', json=json_send)
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
