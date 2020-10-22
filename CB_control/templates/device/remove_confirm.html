@@ -1,0 +1,50 @@
+{% extends "defualt_layout.html" %}
+
+{% block topbar %}
+
+	<div class="col-md-8" style="text-align: right"><h4><a href="{{ url_for('admin_user.logout') }}" style="color: black">Logout</a></h4></div>
+
+{% endblock topbar %}
+
+{% block content %}
+
+	<!-- Login form -->
+	<div class="content-section" style="max-width: 100vh; margin-left: 10vh; margin-top: 20px">
+
+
+
+		<form method="POST" action="">
+			{{ form.hidden_tag() }}
+			<fieldset class="form-group">
+				<legend class="mb-4">Are you sure you want to remove device {{location}}?</legend>
+				<legend class="border-bottom mb-4">Enter your user name and password to confirm.</legend>
+				
+				{% for field in form %}
+                    {% if field.type != "SubmitField" and field.id != "csrf_token" %}
+                        <div class="form-group">
+                            {{ field.label(class="form-control-label") }}
+
+                            {% if field.errors %}
+                                {{ field(class="form-control form-control-lg is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in field.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ field(class="form-control form-control-lg") }}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                
+			</fieldset>
+			<div class="form-group">
+				{{ form.submit(class="btn btn-outline-info") }}
+			</div>
+
+		</form>
+
+	</div>
+
+{% endblock content %}

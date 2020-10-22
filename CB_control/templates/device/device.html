@@ -39,7 +39,7 @@
 				<!-- Remove device section -->
 				<hr>
 				<hr>
-				<dt><a href="{{ url_for('device.remove_device', id=id) }}" style="color: red">Remove Device</a></dt>
+				<dt><a href="{{ url_for('device.confirm_removal', id=id, location=location) }}" style="color: red">Remove Device</a></dt>
 				<dd>Permanently removes the device from the service. All settings will be lost and images associated with it along with the data! The removed device will need to reregister to the service.</dd>
 
 
