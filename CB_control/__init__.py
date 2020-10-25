@@ -13,6 +13,9 @@ login_manager.login_message_category = 'info'
 mail = Mail()
 service_ip = "http://localhost:7000"
 
+from CB_control.models import AdminKey
+admin_key = AdminKey()
+
 
 def create_app(config_class=Config):
 	app = Flask(__name__)

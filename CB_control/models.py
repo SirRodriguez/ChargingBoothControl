@@ -33,3 +33,17 @@ class AdminUser(db.Model, UserMixin):
 		except:
 			return None
 		return AdminUser.query.get(user_id)
+
+###########
+## Local ##
+###########
+
+class AdminKey():
+	def __init__(self):
+		self.admin_key = "None"
+
+	def set_key(self, key):
+		self.admin_key = key
+
+	def get_key(self):
+		return self.admin_key

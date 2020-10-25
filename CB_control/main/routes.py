@@ -15,7 +15,7 @@ def defualt():
 @login_required
 def home():
 	try:
-		payload = requests.get(service_ip + '/site/get_all')		
+		payload = requests.get(service_ip + '/site/get_all')
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('error.server_error'))
