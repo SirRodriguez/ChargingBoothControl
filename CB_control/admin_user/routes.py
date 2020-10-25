@@ -51,6 +51,7 @@ def account():
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('error.server_error'))
 
+	# Check admin Key is good
 	if payload.status_code == 401:
 		if current_user.is_authenticated:
 			logout_user()
@@ -67,10 +68,17 @@ def account():
 
 		# Send the updated account
 		try:
-			response = requests.put(service_ip + '/site/admin_user/update_account/', json=payload)
+			response = requests.put(service_ip + '/site/admin_user/update_account/' + admin_key.get_key(), json=payload)
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
+
+		# Check admin Key is good
+		if response.status_code == 401:
+			if current_user.is_authenticated:
+				logout_user()
+			flash('Please login to access this page.', 'info')
+			return redirect(url_for('admin_user.admin_login'))
 
 		# Check response
 		if response.status_code == 204 or response.status_code == 200:
