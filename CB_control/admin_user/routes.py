@@ -37,6 +37,13 @@ def admin_login():
 # Log out
 @admin_user.route("/logout")
 def logout():
+	# Logout from service
+	try:
+		payload = requests.get(service_ip + '/site/admin_user/logout')
+	except:
+		flash("Unable to Connect to Server!", "danger")
+		return redirect(url_for('error.server_error'))
+
 	logout_user()
 	return redirect(url_for('admin_user.admin_login'))
 
