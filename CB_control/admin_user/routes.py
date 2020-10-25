@@ -112,6 +112,7 @@ def change_request():
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('error.server_error'))
 
+	# Verify admin key
 	if payload.status_code == 401:
 		if current_user.is_authenticated:
 			logout_user()
@@ -137,10 +138,17 @@ def change_token(token):
 		payload["hashed_password"] = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
 		try:
-			response = requests.put(service_ip + '/site/admin_user/update_password/', json=payload)
+			response = requests.put(service_ip + '/site/admin_user/update_password/' + admin_key.get_key(), json=payload)
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
+
+		# Verify admin key
+		if response.status_code == 401:
+			if current_user.is_authenticated:
+				logout_user()
+			flash('Please login to access this page.', 'info')
+			return redirect(url_for('admin_user.admin_login'))
 
 		flash('Your password has been updated!', 'success')
 		return redirect(url_for('admin_user.admin_login'))
