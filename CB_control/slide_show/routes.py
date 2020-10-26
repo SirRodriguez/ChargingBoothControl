@@ -1,6 +1,6 @@
 from flask import Blueprint, flash, redirect, url_for, render_template
-from flask_login import login_required
-from CB_control import service_ip
+from flask_login import login_required, current_user, logout_user
+from CB_control import service_ip, admin_key
 from CB_control.slide_show.forms import SlideShowPicsForm, RemovePictureForm
 import requests
 import secrets
@@ -19,10 +19,17 @@ def slide_show_pics(id, location):
 def upload(id, location):
 	# Grab device image count
 	try:
-		payload = requests.get(service_ip + '/site/image_count/' + str(id))
+		payload = requests.get(service_ip + '/site/image_count/' + str(id) + '/' + admin_key.get_key())
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('error.server_error'))
+
+	# Check admin Key is good
+	if payload.status_code == 401:
+		if current_user.is_authenticated:
+			logout_user()
+		flash('Please login to access this page.', 'info')
+		return redirect(url_for('admin_user.admin_login'))
 
 	image_count = payload.json()["image_count"]
 
@@ -33,7 +40,18 @@ def upload(id, location):
 			image_files.append(('image', ( file.filename, file.read() )  ))
 
 		# Do the post here
-		response = requests.post(service_ip + '/site/images/upload/' + str(id), files=image_files)
+		try:
+			response = requests.post(service_ip + '/site/images/upload/' + str(id) + '/' + admin_key.get_key(), files=image_files)
+		except:
+			flash("Unable to Connect to Server!", "danger")
+			return redirect(url_for('error.server_error'))
+
+		# Check admin Key is good
+		if response.status_code == 401:
+			if current_user.is_authenticated:
+				logout_user()
+			flash('Please login to access this page.', 'info')
+			return redirect(url_for('admin_user.admin_login'))
 
 		flash('Pictures has been uploaded', 'success')
 		return redirect(url_for('slide_show.upload', id=id, location=location))
@@ -58,10 +76,17 @@ def remove(id, location):
 	if form.validate_on_submit():
 		# Post a delete image files here
 		try:
-			response = requests.delete(service_ip + '/site/remove_images/' + str(id) + '/' + form.removals.data)
+			response = requests.delete(service_ip + '/site/remove_images/' + str(id) + '/' + form.removals.data + '/' + admin_key.get_key())
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
+
+		# Check admin Key is good
+		if response.status_code == 401:
+			if current_user.is_authenticated:
+				logout_user()
+			flash('Please login to access this page.', 'info')
+			return redirect(url_for('admin_user.admin_login'))
 
 		if response.status_code == 204:
 			flash('Images have been successfuly removed!', 'success')
@@ -73,10 +98,17 @@ def remove(id, location):
 
 	# Grab device location and image count
 	try:
-		payload = requests.get(service_ip + '/site/image_count/' + str(id))
+		payload = requests.get(service_ip + '/site/image_count/' + str(id) + '/' + admin_key.get_key())
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('error.server_error'))
+
+	# Check admin Key is good
+	if payload.status_code == 401:
+		if current_user.is_authenticated:
+			logout_user()
+		flash('Please login to access this page.', 'info')
+		return redirect(url_for('admin_user.admin_login'))
 
 	image_count = payload.json()["image_count"]
 
