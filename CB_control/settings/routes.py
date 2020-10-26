@@ -1,6 +1,6 @@
 from flask import Blueprint, request, flash, redirect, url_for, render_template
 from flask_login import login_required
-from CB_control import service_ip
+from CB_control import service_ip, admin_key
 from CB_control.settings.forms import SettingsForm
 from CB_control.settings.utils import get_min_sec
 import requests
@@ -30,10 +30,17 @@ def device_settings(id):
 		payload["aspect_ratio_height"] = float(form.aspect_ratio.data.split(":")[1])
 		
 		try:
-			response = requests.put(service_ip + '/site/settings/update/' + str(id), json=payload)
+			response = requests.put(service_ip + '/site/settings/update/' + str(id) + '/' + admin_key.get_key(), json=payload)
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
+
+		# Check admin Key is good
+		if response.status_code == 401:
+			if current_user.is_authenticated:
+				logout_user()
+			flash('Please login to access this page.', 'info')
+			return redirect(url_for('admin_user.admin_login'))
 
 		if response.status_code == 204 or response.status_code == 200:
 			flash('Settings have been updated!', 'success')
@@ -46,11 +53,17 @@ def device_settings(id):
 	elif request.method == 'GET':
 		# Grab device settings
 		try:
-			payload = requests.get(service_ip + '/site/settings/' + str(id))
-		except Exception as e:
-			print(e)
+			payload = requests.get(service_ip + '/site/settings/' + str(id) + '/' + admin_key.get_key())
+		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
+
+		# Check admin Key is good
+		if payload.status_code == 401:
+			if current_user.is_authenticated:
+				logout_user()
+			flash('Please login to access this page.', 'info')
+			return redirect(url_for('admin_user.admin_login'))
 
 		settings = payload.json()
 		
