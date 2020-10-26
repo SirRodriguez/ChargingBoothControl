@@ -1,6 +1,6 @@
 from flask import Blueprint, flash, redirect, url_for, render_template, request
-from flask_login import login_required
-from CB_control import service_ip
+from flask_login import login_required, current_user, logout_user
+from CB_control import service_ip, admin_key
 from CB_control.data.utils import (get_offset_dates_initiated, remove_png, count_years, create_bar_years,
 									save_figure, count_months, create_bar_months, count_days, 
 									create_bar_days, count_hours, create_bar_hours)
@@ -25,10 +25,17 @@ def list_data(id, location):
 	page = request.args.get('page', 1, type=int)
 
 	try:
-		payload = requests.get(service_ip + '/site/sessions/' + str(id) + '/' + str(page))
+		payload = requests.get(service_ip + '/site/sessions/' + str(id) + '/' + str(page) + '/' + admin_key.get_key())
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('error.server_error'))
+
+	# Check admin Key is good
+	if payload.status_code == 401:
+		if current_user.is_authenticated:
+			logout_user()
+		flash('Please login to access this page.', 'info')
+		return redirect(url_for('admin_user.admin_login'))
 
 	pl_json = payload.json()
 	sess_list = pl_json["sessions"]
@@ -52,10 +59,17 @@ def graph_data(id, location):
 def graph_all_years(id, location):
 	# Grab the sessions
 	try:
-		payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
+		payload = requests.get(service_ip + '/site/all_sessions/' + str(id) + '/' + admin_key.get_key())
 	except:
 		flash("Unable to Connect to Server!", "danger")
 		return redirect(url_for('error.server_error'))
+
+	# Check admin Key is good
+	if payload.status_code == 401:
+		if current_user.is_authenticated:
+			logout_user()
+		flash('Please login to access this page.', 'info')
+		return redirect(url_for('admin_user.admin_login'))
 
 	# Get the sessions and settings
 	pl_json = payload.json()
@@ -87,10 +101,18 @@ def graph_year(id, location):
 	if form.validate_on_submit():
 		# Grab the sessions
 		try:
-			payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
+			payload = requests.get(service_ip + '/site/all_sessions/' + str(id) + '/' + admin_key.get_key())
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
+
+		# Check admin Key is good
+		if payload.status_code == 401:
+			if current_user.is_authenticated:
+				logout_user()
+			flash('Please login to access this page.', 'info')
+			return redirect(url_for('admin_user.admin_login'))
+
 
 		pl_json = payload.json()
 		sess_list = pl_json["sessions"]
@@ -123,10 +145,18 @@ def graph_month(id, location):
 	if form.validate_on_submit():
 		# Grab the sessions
 		try:
-			payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
+			payload = requests.get(service_ip + '/site/all_sessions/' + str(id) + '/' + admin_key.get_key())
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
+
+		# Check admin Key is good
+		if payload.status_code == 401:
+			if current_user.is_authenticated:
+				logout_user()
+			flash('Please login to access this page.', 'info')
+			return redirect(url_for('admin_user.admin_login'))
+
 
 		pl_json = payload.json()
 		sess_list = pl_json["sessions"]
@@ -159,10 +189,18 @@ def graph_day(id, location):
 	if form.validate_on_submit():
 		# Grab the sessions
 		try:
-			payload = requests.get(service_ip + '/site/all_sessions/' + str(id))
+			payload = requests.get(service_ip + '/site/all_sessions/' + str(id) + '/' + admin_key.get_key())
 		except:
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
+
+		# Check admin Key is good
+		if payload.status_code == 401:
+			if current_user.is_authenticated:
+				logout_user()
+			flash('Please login to access this page.', 'info')
+			return redirect(url_for('admin_user.admin_login'))
+
 		
 		pl_json = payload.json()
 		sess_list = pl_json["sessions"]
