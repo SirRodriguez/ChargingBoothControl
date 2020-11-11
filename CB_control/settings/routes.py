@@ -1,5 +1,5 @@
 from flask import Blueprint, request, flash, redirect, url_for, render_template
-from flask_login import login_required
+from flask_login import login_user, current_user, logout_user, login_required
 from CB_control import service_ip, admin_key
 from CB_control.settings.forms import SettingsForm
 from CB_control.settings.utils import get_min_sec

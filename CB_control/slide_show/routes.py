@@ -1,5 +1,5 @@
 from flask import Blueprint, flash, redirect, url_for, render_template
-from flask_login import login_required, current_user, logout_user
+from flask_login import login_user, current_user, logout_user, login_required
 from CB_control import service_ip, admin_key
 from CB_control.slide_show.forms import SlideShowPicsForm, RemovePictureForm
 import requests

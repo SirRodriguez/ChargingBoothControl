@@ -1,5 +1,5 @@
 from flask import Blueprint, flash, redirect, url_for, render_template, request
-from flask_login import login_required, current_user, logout_user
+from flask_login import login_user, current_user, logout_user, login_required
 from CB_control import service_ip, admin_key
 from CB_control.data.utils import (get_offset_dates_initiated, remove_png, count_years, create_bar_years,
 									save_figure, count_months, create_bar_months, count_days, 
@@ -16,7 +16,7 @@ def main(id, location):
 	return render_template("data/data.html", title="Data", location=location, id=id)
 
 # List Data
-@data.route("/device/list_data/<int:id>/<string:location>")
+@data.route("/device/list_data/<int:id>/<string:location>/")
 @login_required
 def list_data(id, location):
 	# Grab the device data listed 
@@ -47,7 +47,7 @@ def list_data(id, location):
 
 	sessions_and_dates = zip(sess_list, date_strings) # Pack them together to iterate simultaniously
 	return render_template("data/list_data.html", title="List Data", iter_pages=iter_pages, 
-							page=page, sessions_and_dates=sessions_and_dates, id=id)
+							page=page, sessions_and_dates=sessions_and_dates, id=id, location=location)
 
 @data.route("/device/graph_data/<int:id>/<string:location>")
 @login_required
