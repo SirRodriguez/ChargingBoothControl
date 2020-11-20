@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 from CB_control.config import Config
+import os
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -11,8 +12,7 @@ login_manager = LoginManager()
 login_manager.login_view = 'admin_user.admin_login'
 login_manager.login_message_category = 'info'
 mail = Mail()
-service_ip = "http://167.172.200.1:7000"
-# service_ip = "http://localhost:7000"
+service_ip = os.environ.get('SERVICE_IP')
 
 from CB_control.models import AdminKey
 admin_key = AdminKey()
