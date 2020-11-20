@@ -11,7 +11,8 @@ login_manager = LoginManager()
 login_manager.login_view = 'admin_user.admin_login'
 login_manager.login_message_category = 'info'
 mail = Mail()
-service_ip = "http://localhost:7000"
+service_ip = "http://167.172.200.1:7000"
+# service_ip = "http://localhost:7000"
 
 from CB_control.models import AdminKey
 admin_key = AdminKey()
