@@ -32,13 +32,22 @@
 	<!-- The top bar -->
 	<div class="row" style="background-color: steelblue; padding-left: 10vh; padding-right: 10vh">
 		{% if title %}
-			<div class="col-md-4"><h4><a href="{{ url_for('main.home') }}" style="color: black">C.B.C.</a> - <a href="{{ url_for('admin_user.account') }}" style="color: black">Account Info</a> - {{ title }}</h4></div>
+			<div class="col-md-8">
+				<h4>
+					<a href="{{ url_for('main.home') }}" style="color: black">Home</a> -
+					{{ title }}
+				</h4>
+			</div>
 		{% else %}
-			<div class="col-md-4"><h4><a href="{{ url_for('main.home') }}" style="color: black">Charging Booth Controller</a> - <a href="{{ url_for('admin_user.account') }}" style="color: black">Account Info</a></h4></div>
+			<div class="col-md-8">
+				<h4>
+					<a href="{{ url_for('main.home') }}" style="color: black">Home</a>
+				</h4>
+			</div>
 		{% endif %}
 
-		<!-- There are 8 remaining columns to work with -->
-		{% block topbar %}{% endblock topbar %}
+		<!-- There are 4 remaining columns to work with -->
+		<div class="col-md-4" style="text-align: right"><h4><a href="{{ url_for('admin_user.account') }}" style="color: black">Account Info</a> - <a href="{{ url_for('admin_user.logout') }}" style="color: black">Logout</a></h4></div>
 	</div>
 
 	<!-- Flash Messages -->
