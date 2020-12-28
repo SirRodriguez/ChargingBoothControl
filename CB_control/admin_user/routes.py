@@ -104,6 +104,10 @@ def account():
 # Forgot password when logged out
 @admin_user.route("/reset_password")
 def reset_request():
+	# !!!
+	# These routes are depreciated because of non-working email
+	return redirect(url_for('main.home'))
+
 	if current_user.is_authenticated:
 		return redirect(url_for('main.home'))
 
@@ -112,6 +116,10 @@ def reset_request():
 #Change password when logged in
 @admin_user.route("/change_password")
 def change_request():
+	# !!!
+	# These routes are depreciated because of non-working email
+	return redirect(url_for('main.home'))
+
 	# Get account info from service
 	try:
 		payload = requests.get(service_ip + '/site/admin_user/account_info/' + admin_key.get_key())
@@ -134,6 +142,10 @@ def change_request():
 
 @admin_user.route("/change_token/<token>", methods=['GET', 'POST'])
 def change_token(token):
+	# !!!
+	# These routes are depreciated because of non-working email
+	return redirect(url_for('main.home'))
+	
 	user = AdminUser.verify_reset_token(token)
 	if user is None:
 		flash('That is an invalid or expired token', 'warning')
