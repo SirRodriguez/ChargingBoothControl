@@ -19,7 +19,8 @@ def admin_login():
 
 		try:
 			payload = requests.get(service_ip + '/site/admin_user/verify_user', json=json_send)
-		except:
+		except Exception as e:
+			print(e)
 			flash("Unable to Connect to Server!", "danger")
 			return redirect(url_for('error.server_error'))
 
@@ -101,9 +102,21 @@ def account():
 
 	return render_template("admin_user/account.html", title="Account Information", form=form, payload=payload)
 
-# Forgot password when logged out
+
 @admin_user.route("/reset_password")
 def reset_request():
+	return redirect(service_ip + '/reset_password')
+
+
+
+
+################################
+# Old depreciated routes below #
+################################
+
+# Forgot password when logged out
+@admin_user.route("/reset_password_OLD")
+def reset_request_OLD():
 	# !!!
 	# These routes are depreciated because of non-working email
 	return redirect(url_for('main.home'))
@@ -114,8 +127,8 @@ def reset_request():
 	return redirect(service_ip + '/reset_password')
 
 #Change password when logged in
-@admin_user.route("/change_password")
-def change_request():
+@admin_user.route("/change_password_OLD")
+def change_request_OLD():
 	# !!!
 	# These routes are depreciated because of non-working email
 	return redirect(url_for('main.home'))
@@ -140,12 +153,12 @@ def change_request():
 	flash('An email has been sent with instructions to reset your password.', 'info')
 	return redirect(url_for('admin_user.account'))
 
-@admin_user.route("/change_token/<token>", methods=['GET', 'POST'])
-def change_token(token):
+@admin_user.route("/change_token_OLD/<token>", methods=['GET', 'POST'])
+def change_token_OLD(token):
 	# !!!
 	# These routes are depreciated because of non-working email
 	return redirect(url_for('main.home'))
-	
+
 	user = AdminUser.verify_reset_token(token)
 	if user is None:
 		flash('That is an invalid or expired token', 'warning')
