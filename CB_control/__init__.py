@@ -23,6 +23,8 @@ admin_key = AdminKey()
 def create_app(config_class=Config):
 	app = Flask(__name__)
 	app.config.from_object(Config)
+	print(os.environ.get('SECRET_KEY'))
+	print(os.environ.get('WTF_CSRF_SECRET_KEY'))
 
 	db.init_app(app)
 	bcrypt.init_app(app)
