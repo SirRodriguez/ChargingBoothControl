@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
+from flask_wtf.csrf import CSRFProtect
 from CB_control.config import Config
 import os
 
@@ -12,6 +13,7 @@ login_manager = LoginManager()
 login_manager.login_view = 'admin_user.admin_login'
 login_manager.login_message_category = 'info'
 mail = Mail()
+csrf = CSRFProtect()
 service_ip = os.environ.get('SERVICE_IP')
 
 from CB_control.models import AdminKey
@@ -26,6 +28,7 @@ def create_app(config_class=Config):
 	bcrypt.init_app(app)
 	login_manager.init_app(app)
 	mail.init_app(app)
+	csrf.init_app(app)
 
 
 	from CB_control.main.routes import main
