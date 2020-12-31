@@ -43,7 +43,11 @@ class AdminKey():
 		self.admin_key = "None"
 
 	def set_key(self, key):
+		print("-----set key-----")
+		print("-----key: ", self.admin_key)
 		self.admin_key = key
 
 	def get_key(self):
+		print("-----get key-----")
+		print("-----key: ", self.admin_key)
 		return self.admin_key
