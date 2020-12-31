@@ -44,8 +44,9 @@ class AdminKey():
 
 	def set_key(self, key):
 		print("-----set key-----")
-		print("-----key: ", self.admin_key)
+		print("-----key: ", self.key)
 		self.admin_key = key
+		print("-----admin key: ", self.admin_key)
 
 	def get_key(self):
 		print("-----get key-----")
