@@ -26,6 +26,7 @@ def admin_login():
 
 		user = AdminUser.query.first()
 		if payload.json()["user_verified"]:
+			print("-----recieved admin key: ", payload.json()["admin_key"])
 			admin_key.set_key(payload.json()["admin_key"])
 			login_user(user)
 			next_page = request.args.get('next')
